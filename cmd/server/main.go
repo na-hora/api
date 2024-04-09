@@ -13,7 +13,7 @@ import (
 
 func init() {
 	configs.LoadConfig()
-	// configs.ConnectToDB()
+	configs.ConnectToDB()
 }
 
 func main() {
