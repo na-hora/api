@@ -19,4 +19,6 @@ type Company struct {
 	CreatedAt   time.Time      `json:"createdAt"`
 	UpdatedAt   time.Time      `json:"updatedAt"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
+
+	Category CompanyCategory `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
