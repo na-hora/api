@@ -14,4 +14,4 @@ seed:
 		atlas migrate hash; atlas migrate new seed_$(name)
 
 m-apply:
-		atlas migrate hash; atlas migrate apply --url ${DB_URL}
+		atlas migrate hash; atlas migrate apply --url ${DB_URL}?sslmode=disable
