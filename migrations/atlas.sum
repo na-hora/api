@@ -1,4 +1,4 @@
-h1:unFe2e+uTN/QA6CIQMdaF/3TUNjVvluNMp30+HYKNLw=
+h1:54cGqdzwivVYYZB0U7USI5FCchoUJut5OQJVrJMaEEw=
 20240420150301_create_state_table.sql h1:Y8MVzmBsgOIiQexvyOh05XqtG8CvCDrCUFmOoFtuCvQ=
 20240420150302_create_city_table.sql h1:qXC6G/5EyYqPWYKJ051S55XGjKb5U2j0Xm+YUDHEfjk=
 20240420150303_create_company_category_table.sql h1:pku47oUSipqOJQrowfP6MWFN71g/ivYjPCM720rP2/U=
@@ -17,3 +17,4 @@ h1:unFe2e+uTN/QA6CIQMdaF/3TUNjVvluNMp30+HYKNLw=
 20240420205617_create_pet_size_table.sql h1:U5sWxn83yRP2MmHbWvdQ4gUA49zbQnFuceeOOnX36j0=
 20240420210035_create_company_pet_size_table.sql h1:1RhYLqxtynr9pxPlbj5j7jTyXj021QzFAYc3YDHf1ss=
 20240420210553_create_client_table.sql h1:0nr5/wceDt4/73ptf+/S8E30l0KvnZO76FW4DoW+N94=
+20240420211100_create_company_blocklist.sql h1:kKMvMasrgS6GLCkMytz/ahsqgE+bdMxJlpWtXR3SVOA=
