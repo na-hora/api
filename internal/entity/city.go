@@ -11,7 +11,7 @@ type City struct {
 	IBGE      string    `json:"ibge" gorm:"not null"`
 	LatLon    string    `json:"latLon"`
 	CodTom    uint      `json:"codTom"`
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 
 	State State `json:"state" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

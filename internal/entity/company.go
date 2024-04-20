@@ -16,8 +16,8 @@ type Company struct {
 	Phone       string         `json:"phone" gorm:"not null"`
 	AvatarUrl   string         `json:"avatarUrl"`
 	CategoryID  int            `json:"categoryId" gorm:"not null"`
-	CreatedAt   time.Time      `json:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt"`
+	CreatedAt   time.Time      `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
+	UpdatedAt   time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 
 	Category CompanyCategory `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`

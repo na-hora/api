@@ -10,5 +10,5 @@ type State struct {
 	Name      string    `json:"name" gorm:"not null;unique"`
 	IBGE      int       `json:"ibge" gorm:"not null"`
 	DDD       string    `json:"ddd"`
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 }
