@@ -1,5 +1,5 @@
 INSERT INTO
-	"cities" (id, name, state_id, ibge, lat_lon, cod_tom)
+	"city" (id, name, state_id, ibge, lat_lon, cod_tom)
 VALUES
 	(
 		1501,

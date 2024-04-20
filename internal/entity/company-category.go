@@ -13,3 +13,7 @@ type CompanyCategory struct {
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
+
+func (CompanyCategory) TableName() string {
+	return "company_category"
+}

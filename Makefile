@@ -8,7 +8,7 @@ build:
 		go build cmd/server/main.go && ./main
 
 m-generate:
-		atlas migrate hash; atlas migrate diff --env gorm
+		atlas migrate hash; atlas migrate diff --env gorm $(name)
 
 seed:
 		atlas migrate hash; atlas migrate new seed_$(name)

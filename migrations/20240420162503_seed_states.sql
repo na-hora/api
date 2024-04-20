@@ -1,5 +1,5 @@
 INSERT INTO
-	"states" (id, name, uf, ibge, ddd)
+	"state" (id, name, uf, ibge, ddd)
 VALUES
 	(1, 'Acre', 'AC', 12, '[68]'),
 	(2, 'Alagoas', 'AL', 27, '[82]'),

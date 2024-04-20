@@ -1,4 +1,4 @@
 INSERT INTO
-	"company_categories" (id, name)
+	"company_category" (id, name)
 VALUES
 	(1, 'Petshop');

@@ -22,3 +22,7 @@ type Company struct {
 
 	Category CompanyCategory `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
+
+func (Company) TableName() string {
+	return "company"
+}

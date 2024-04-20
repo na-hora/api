@@ -12,3 +12,7 @@ type State struct {
 	DDD       string    `json:"ddd"`
 	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 }
+
+func (State) TableName() string {
+	return "state"
+}

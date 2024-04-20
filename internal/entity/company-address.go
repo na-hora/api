@@ -21,3 +21,7 @@ type CompanyAddress struct {
 	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	City    City    `json:"city" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
+
+func (CompanyAddress) TableName() string {
+	return "company_address"
+}

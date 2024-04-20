@@ -15,3 +15,7 @@ type City struct {
 
 	State State `json:"state" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
+
+func (City) TableName() string {
+	return "city"
+}
