@@ -20,7 +20,9 @@ type Company struct {
 	UpdatedAt   time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 
-	Category CompanyCategory `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Category         CompanyCategory  `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyHours     []CompanyHour    `json:"companyHours" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyAddresses []CompanyAddress `json:"companyAddresses" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (Company) TableName() string {

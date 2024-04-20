@@ -1,4 +1,4 @@
-h1:BAxGP3LXuvU6KhdzEhmOMrUHDP7ROa5ic2CAanUXEwc=
+h1:YYnPnV2tdNNYdmwSZn1xgb7OgOwiA7crluGvbbimPxs=
 20240420150301_create_state_table.sql h1:Y8MVzmBsgOIiQexvyOh05XqtG8CvCDrCUFmOoFtuCvQ=
 20240420150302_create_city_table.sql h1:qXC6G/5EyYqPWYKJ051S55XGjKb5U2j0Xm+YUDHEfjk=
 20240420150303_create_company_category_table.sql h1:pku47oUSipqOJQrowfP6MWFN71g/ivYjPCM720rP2/U=
@@ -10,3 +10,5 @@ h1:BAxGP3LXuvU6KhdzEhmOMrUHDP7ROa5ic2CAanUXEwc=
 20240420162558_seed_cities_3.sql h1:jp2+q8mde8tFPdZIT2yF1/aPPsiXVZkTyS0vdTnFv1w=
 20240420162609_seed_cities_4.sql h1:UkC58qm7svfuIw+ghy+M/df7DcpZPoeddVa3Lok5xg8=
 20240420162903_seed_company_categories.sql h1:kOEXo+IInXU9Aub0YdxQUy0E7HscOBTlGFicVFPXc3c=
+20240420171956_create_company_hour_table.sql h1:Ncona/GZl9DdzvZd+juzfCW1eMxxSpkU+e5lIS6+O/4=
+20240420172300_create_company_relations.sql h1:4OfzfSasxWX2SmCQVh9p3C/jg2XSb4V4jEJv41zkWGk=
