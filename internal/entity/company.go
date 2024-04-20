@@ -26,6 +26,7 @@ type Company struct {
 	CompanyHours     []CompanyHour    `json:"companyHours" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	CompanyAddresses []CompanyAddress `json:"companyAddresses" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Users            []User           `json:"users" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Services         []Service        `json:"services" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (Company) TableName() string {
