@@ -1,11 +1,11 @@
 package initializers
 
 import (
+	routesConfig "na-hora/api/internal/routes/config"
+
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
-
-	routes "na-hora/api/internal/routes"
 )
 
 func Routes(r chi.Router) {
@@ -23,7 +23,5 @@ func Routes(r chi.Router) {
 		MaxAge:           300,
 	}))
 
-	routes.UserRoutes(r)
-	// routes.EventRoutes(r)
-	// routes.EventReviewRoutes(r)
+	routesConfig.VersionedRoutes(r, "/api/v1")
 }
