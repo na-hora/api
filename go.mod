@@ -6,6 +6,7 @@ require (
 	ariga.io/atlas-provider-gorm v0.3.2
 	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/cors v1.2.1
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.18.2
