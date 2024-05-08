@@ -14,14 +14,14 @@ type CompanyAddress struct {
 	CityID       uint      `json:"cityId"`
 	Neighborhood string    `json:"neighborhood"`
 	Street       string    `json:"street"`
-	Number       string    `json:"number"`
+	Number       uint      `json:"number"`
 	Complement   string    `json:"complement"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 
-	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	City    City    `json:"city" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
+	City    City    `json:"city" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CityID;references:ID;"`
 }
 
 func (CompanyAddress) TableName() string {

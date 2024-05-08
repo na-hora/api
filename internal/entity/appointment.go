@@ -10,7 +10,7 @@ type Appointment struct {
 	ID                uuid.UUID `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid();"`
 	CompanyID         uuid.UUID `json:"companyId" gorm:"not null"`
 	ClientID          uuid.UUID `json:"clientId" gorm:"not null"`
-	PetBreedID        int       `json:"petBreedId" gorm:"not null"`
+	CompanyServiceID  uuid.UUID `json:"companyServiceId" gorm:"not null"`
 	PetName           string    `json:"petName"`
 	StartTime         time.Time `json:"startTime" gorm:"not null"`
 	TotalTime         int       `json:"totalTime" gorm:"not null"`
@@ -21,9 +21,9 @@ type Appointment struct {
 	CreatedAt         time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt         time.Time `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 
-	Company  Company  `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Client   Client   `json:"client" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	PetBreed PetBreed `json:"petBreed" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Company        Company        `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
+	Client         Client         `json:"client" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:ClientID;references:ID;"`
+	CompanyService CompanyService `json:"companyService" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyServiceID;references:ID;"`
 }
 
 func (Appointment) TableName() string {

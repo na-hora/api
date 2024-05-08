@@ -22,15 +22,14 @@ type Company struct {
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 
-	Category         CompanyCategory    `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CompanyHours     []CompanyHour      `json:"companyHours" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CompanyAddresses []CompanyAddress   `json:"companyAddresses" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Users            []User             `json:"users" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Services         []Service          `json:"services" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Appointments     []Appointment      `json:"appointments" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Blocks           []CompanyBlocklist `json:"blocks" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CompanyPetBreeds []CompanyPetBreed  `json:"companyPetBreeds" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	CompanyPetSizes  []CompanyPetSize   `json:"companyPetSizes" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Category         CompanyCategory  `json:"category" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CategoryID;references:ID"`
+	CompanyHours     []CompanyHour    `json:"companyHours" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyAddresses []CompanyAddress `json:"companyAddresses" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Users            []User           `json:"users" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyServices  []CompanyService `json:"services" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Appointments     []Appointment    `json:"appointments" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyPetHairs  []CompanyPetHair `json:"companyPetBreeds" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	CompanyPetSizes  []CompanyPetSize `json:"companyPetSizes" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (Company) TableName() string {

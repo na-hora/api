@@ -7,20 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// table service {
-//   id int pk
-//   company_id uuid [not null]
-//   name string [not null]
-//   price float [not null]
-//   execution_time int [not null]
-//   concurrency int [not null, default: 1]
-//   created_at timestamp [default: 'now()']
-//   updated_at timestamp [default: 'now()']
-//   deleted_at timestamp [default: 'null']
-// }
-// Ref: service.company_id>company.id
-
-type Service struct {
+type CompanyService struct {
 	ID uint `json:"id" gorm:"primaryKey;autoIncrement:true"`
 
 	CompanyID     uuid.UUID `json:"companyId" gorm:"not null"`
@@ -33,9 +20,9 @@ type Service struct {
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 
-	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
 }
 
-func (Service) TableName() string {
-	return "service"
+func (CompanyService) TableName() string {
+	return "company_service"
 }

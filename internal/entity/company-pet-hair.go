@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type CompanyPetSize struct {
+type CompanyPetHair struct {
 	ID        int       `json:"id" gorm:"primaryKey;type:integer;autoIncrement"`
 	Name      string    `json:"name" gorm:"not null"`
 	CompanyID uuid.UUID `json:"companyId" gorm:"not null"`
@@ -16,6 +16,6 @@ type CompanyPetSize struct {
 	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
 }
 
-func (CompanyPetSize) TableName() string {
-	return "company_pet_size"
+func (CompanyPetHair) TableName() string {
+	return "company_pet_hair"
 }
