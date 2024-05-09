@@ -1,12 +1,3 @@
--- Create "client" table
-CREATE TABLE "public"."client" (
-  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-  "name" text NOT NULL,
-  "phone" text NOT NULL,
-  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id")
-);
 -- Create "company_category" table
 CREATE TABLE "public"."company_category" (
   "id" bigserial NOT NULL,
@@ -36,28 +27,73 @@ CREATE TABLE "public"."company" (
 );
 -- Create index "idx_company_deleted_at" to table: "company"
 CREATE INDEX "idx_company_deleted_at" ON "public"."company" ("deleted_at");
--- Create "company_service" table
-CREATE TABLE "public"."company_service" (
+-- Create "company_pet_hair" table
+CREATE TABLE "public"."company_pet_hair" (
+  "id" bigserial NOT NULL,
+  "name" text NOT NULL,
+  "company_id" uuid NOT NULL,
+  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  CONSTRAINT "fk_company_company_pet_hairs" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
+);
+-- Create "company_pet_service" table
+CREATE TABLE "public"."company_pet_service" (
   "id" bigserial NOT NULL,
   "company_id" uuid NOT NULL,
   "name" text NOT NULL,
-  "price" numeric NOT NULL,
-  "execution_time" bigint NOT NULL,
   "concurrency" bigint NOT NULL DEFAULT 1,
   "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
   "deleted_at" timestamptz NULL,
   PRIMARY KEY ("id"),
-  CONSTRAINT "fk_company_company_services" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
+  CONSTRAINT "fk_company_company_pet_services" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
 );
--- Create index "idx_company_service_deleted_at" to table: "company_service"
-CREATE INDEX "idx_company_service_deleted_at" ON "public"."company_service" ("deleted_at");
+-- Create index "idx_company_pet_service_deleted_at" to table: "company_pet_service"
+CREATE INDEX "idx_company_pet_service_deleted_at" ON "public"."company_pet_service" ("deleted_at");
+-- Create "company_pet_size" table
+CREATE TABLE "public"."company_pet_size" (
+  "id" bigserial NOT NULL,
+  "name" text NOT NULL,
+  "company_id" uuid NOT NULL,
+  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id"),
+  CONSTRAINT "fk_company_company_pet_sizes" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
+);
+-- Create "company_pet_service_value" table
+CREATE TABLE "public"."company_pet_service_value" (
+  "id" bigserial NOT NULL,
+  "company_pet_service_id" bigint NOT NULL,
+  "company_pet_size_id" integer NOT NULL,
+  "company_pet_hair_id" integer NOT NULL,
+  "price" numeric NOT NULL,
+  "execution_time" bigint NOT NULL,
+  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  "deleted_at" timestamptz NULL,
+  PRIMARY KEY ("id"),
+  CONSTRAINT "fk_company_pet_service_value_company_pet_hair" FOREIGN KEY ("company_pet_hair_id") REFERENCES "public"."company_pet_hair" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT "fk_company_pet_service_value_company_pet_service" FOREIGN KEY ("company_pet_service_id") REFERENCES "public"."company_pet_service" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT "fk_company_pet_service_value_company_pet_size" FOREIGN KEY ("company_pet_size_id") REFERENCES "public"."company_pet_size" ("id") ON UPDATE CASCADE ON DELETE SET NULL
+);
+-- Create index "idx_company_pet_service_value_deleted_at" to table: "company_pet_service_value"
+CREATE INDEX "idx_company_pet_service_value_deleted_at" ON "public"."company_pet_service_value" ("deleted_at");
+-- Create "client" table
+CREATE TABLE "public"."client" (
+  "id" uuid NOT NULL DEFAULT gen_random_uuid(),
+  "name" text NOT NULL,
+  "phone" text NOT NULL,
+  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY ("id")
+);
 -- Create "appointment" table
 CREATE TABLE "public"."appointment" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
   "company_id" uuid NOT NULL,
   "client_id" uuid NOT NULL,
-  "company_service_id" bigint NOT NULL,
+  "company_pet_service_value_id" bigint NOT NULL,
   "pet_name" text NULL,
   "start_time" timestamptz NOT NULL,
   "total_time" bigint NOT NULL,
@@ -68,8 +104,8 @@ CREATE TABLE "public"."appointment" (
   "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY ("id"),
-  CONSTRAINT "fk_appointment_client" FOREIGN KEY ("client_id") REFERENCES "public"."client" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
-  CONSTRAINT "fk_appointment_company_service" FOREIGN KEY ("company_service_id") REFERENCES "public"."company_service" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT "fk_appointment_company_pet_service_value" FOREIGN KEY ("company_pet_service_value_id") REFERENCES "public"."company_pet_service_value" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
+  CONSTRAINT "fk_client_appointments" FOREIGN KEY ("client_id") REFERENCES "public"."client" ("id") ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT "fk_company_appointments" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
 );
 -- Create "state" table
@@ -129,26 +165,6 @@ CREATE TABLE "public"."company_hour" (
 );
 -- Create index "idx_company_hour_deleted_at" to table: "company_hour"
 CREATE INDEX "idx_company_hour_deleted_at" ON "public"."company_hour" ("deleted_at");
--- Create "company_pet_hair" table
-CREATE TABLE "public"."company_pet_hair" (
-  "id" bigserial NOT NULL,
-  "name" text NOT NULL,
-  "company_id" uuid NOT NULL,
-  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id"),
-  CONSTRAINT "fk_company_company_pet_hairs" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
-);
--- Create "company_pet_size" table
-CREATE TABLE "public"."company_pet_size" (
-  "id" bigserial NOT NULL,
-  "name" text NOT NULL,
-  "company_id" uuid NOT NULL,
-  "created_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" timestamptz NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id"),
-  CONSTRAINT "fk_company_company_pet_sizes" FOREIGN KEY ("company_id") REFERENCES "public"."company" ("id") ON UPDATE CASCADE ON DELETE SET NULL
-);
 -- Create "user" table
 CREATE TABLE "public"."user" (
   "id" uuid NOT NULL DEFAULT gen_random_uuid(),
