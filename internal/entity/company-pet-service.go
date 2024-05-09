@@ -7,13 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type CompanyHour struct {
+type CompanyPetService struct {
 	ID uint `json:"id" gorm:"primaryKey;autoIncrement:true"`
 
-	CompanyID uuid.UUID `json:"companyId" gorm:"not null"`
-	Weekday   int       `json:"weekday" gorm:"not null"`
-	StartHour float64   `json:"startHour" gorm:"not null"`
-	EndHour   float64   `json:"endHour" gorm:"not null"`
+	CompanyID   uuid.UUID `json:"companyId" gorm:"not null"`
+	Name        string    `json:"name" gorm:"not null"`
+	Concurrency int       `json:"concurrency" gorm:"not null;default:1"`
 
 	CreatedAt time.Time      `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
@@ -22,6 +21,6 @@ type CompanyHour struct {
 	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
 }
 
-func (CompanyHour) TableName() string {
-	return "company_hour"
+func (CompanyPetService) TableName() string {
+	return "company_pet_service"
 }

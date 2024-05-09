@@ -15,7 +15,7 @@ type City struct {
 
 	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 
-	State State `json:"state" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	State State `json:"state" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:StateID;references:ID;"`
 }
 
 func (City) TableName() string {
