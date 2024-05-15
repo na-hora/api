@@ -12,6 +12,7 @@ type Appointment struct {
 	ClientID                 uuid.UUID `json:"clientId" gorm:"not null"`
 	CompanyPetServiceValueID uuid.UUID `json:"CompanyPetServiceValueId" gorm:"not null"`
 	PetName                  string    `json:"petName"`
+	Note                     string    `json:"note"`
 	StartTime                time.Time `json:"startTime" gorm:"not null"`
 	TotalTime                int       `json:"totalTime" gorm:"not null"`
 	TotalPrice               float64   `json:"totalPrice" gorm:"not null"`
