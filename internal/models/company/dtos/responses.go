@@ -1,0 +1,3 @@
+type CreateCompanyResponse {
+  ID string
+}

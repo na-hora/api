@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
-	"na-hora/api/internal/dto"
+	companyDTOs "na-hora/api/internal/models/company/dtos"
 	"na-hora/api/internal/models/company/services"
-
+	"na-hora/api/internal/utils"
 	"net/http"
 )
 
@@ -24,7 +24,7 @@ func GetCompanyHandler() CompanyHandler {
 }
 
 func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var companyPayload dto.CompanyCreate
+	var companyPayload companyDTOs.CreateCompanyRequestBody
 
 	err := json.NewDecoder(r.Body).Decode(&companyPayload)
 	if err != nil {
@@ -32,7 +32,7 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appErr := companyPayload.ValidateCNPJ()
+	appErr := utils.ValidateCNPJ(companyPayload.CNPJ)
 	if appErr != nil {
 		w.WriteHeader(appErr.StatusCode)
 		json.NewEncoder(w).Encode(appErr.Message)
