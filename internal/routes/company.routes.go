@@ -9,5 +9,7 @@ import (
 func CompanyRoutes(r chi.Router) {
 	companyController := companyControllers.GetCompanyController()
 
-	r.Post("/register", companyController.Register)
+	r.Route("/companies", func(r chi.Router) {
+		r.Post("/register", companyController.Register)
+	})
 }

@@ -41,7 +41,7 @@ func (c *companyController) Register(w http.ResponseWriter, r *http.Request) {
 
 	appErr = c.companyUsecase.CreateCompany(companyPayload)
 
-	if err != nil {
+	if appErr != nil {
 		w.WriteHeader(appErr.StatusCode)
 		json.NewEncoder(w).Encode(appErr.Message)
 		return
