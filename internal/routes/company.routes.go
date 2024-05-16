@@ -1,11 +1,13 @@
 package routes
 
 import (
-	companyControllers "na-hora/api/internal/models/company/controllers"
-
 	"github.com/go-chi/chi"
+
+	companyControllers "na-hora/api/internal/models/company/controllers"
 )
 
 func CompanyRoutes(r chi.Router) {
-	r.Post("/register", companyControllers.Register)
+	companyController := companyControllers.GetCompanyController()
+
+	r.Post("/register", companyController.Register)
 }

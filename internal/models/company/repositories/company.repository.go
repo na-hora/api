@@ -1,7 +1,9 @@
 package repositories
 
 import (
+	config "na-hora/api/configs"
 	"na-hora/api/internal/dto"
+	"na-hora/api/internal/entity"
 	"na-hora/api/internal/utils"
 	"net/http"
 
@@ -16,12 +18,24 @@ type companyRepository struct {
 	db *gorm.DB
 }
 
-func NewCompanyRepository(db *gorm.DB) CompanyRepository {
-	return &companyRepository{db: db}
+func GetCompanyRepository() CompanyRepository {
+	db := config.DB
+	return &companyRepository{db}
 }
 
-func (c *companyRepository) Create(company dto.CompanyCreate) *utils.AppError {
-	data := c.db.Create(&company)
+func (cr *companyRepository) Create(insert dto.CompanyCreate) *utils.AppError {
+	insertValue := entity.Company{
+		CNPJ:        insert.Cnpj,
+		Name:        insert.Name,
+		FantasyName: insert.FantasyName,
+		Email:       insert.Email,
+		Phone:       insert.Phone,
+		AvatarUrl:   insert.AvatarUrl,
+		CategoryID:  1, // TODO: enum
+	}
+
+	data := cr.db.Create(&insertValue)
+
 	if data.Error != nil {
 		return &utils.AppError{
 			Message:    data.Error.Error(),

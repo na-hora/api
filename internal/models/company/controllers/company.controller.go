@@ -1,14 +1,29 @@
-package companyControllers
+package controllers
 
 import (
 	"encoding/json"
 	"na-hora/api/internal/dto"
-	"na-hora/api/internal/models/company/repositories"
-	companyUsecase "na-hora/api/internal/models/company/usecases"
+	usecases "na-hora/api/internal/models/company/usecases"
+
 	"net/http"
 )
 
-func Register(w http.ResponseWriter, r *http.Request) {
+type CompanyController interface {
+	Register(w http.ResponseWriter, r *http.Request)
+}
+
+type companyController struct {
+	companyUsecase usecases.CompanyUsecase
+}
+
+func GetCompanyController() CompanyController {
+	companyUsecase := usecases.GetCompanyUsecase()
+	return &companyController{
+		companyUsecase,
+	}
+}
+
+func (c *companyController) Register(w http.ResponseWriter, r *http.Request) {
 	var companyPayload dto.CompanyCreate
 
 	err := json.NewDecoder(r.Body).Decode(&companyPayload)
@@ -24,9 +39,8 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	companyUsecase := companyUsecase.NewCompanyUsecase(repositories.NewCompanyRepository(nil))
+	appErr = c.companyUsecase.CreateCompany(companyPayload)
 
-	appErr = companyUsecase.CreateCompany(companyPayload)
 	if err != nil {
 		w.WriteHeader(appErr.StatusCode)
 		json.NewEncoder(w).Encode(appErr.Message)

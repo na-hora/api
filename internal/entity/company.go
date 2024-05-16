@@ -12,7 +12,7 @@ type Company struct {
 
 	Name        string `json:"name" gorm:"not null"`
 	FantasyName string `json:"fantasyName" gorm:"not null"`
-	Cnpj        string `json:"cnpj" gorm:"not null"`
+	CNPJ        string `json:"cnpj" gorm:"not null"`
 	Email       string `json:"email" gorm:"not null"`
 	Phone       string `json:"phone" gorm:"not null"`
 	AvatarUrl   string `json:"avatarUrl"`
