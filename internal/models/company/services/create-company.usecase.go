@@ -1,4 +1,4 @@
-package usecases
+package services
 
 import (
 	"na-hora/api/internal/dto"
@@ -6,22 +6,22 @@ import (
 	"na-hora/api/internal/utils"
 )
 
-type CompanyUsecase interface {
+type CompanyService interface {
 	CreateCompany(companyCreate dto.CompanyCreate) *utils.AppError
 }
 
-type companyUsecase struct {
+type companyService struct {
 	companyRepository repositories.CompanyRepository
 }
 
-func GetCompanyUsecase() CompanyUsecase {
+func GetCompanyService() CompanyService {
 	companyRepo := repositories.GetCompanyRepository()
-	return &companyUsecase{
+	return &companyService{
 		companyRepo,
 	}
 }
 
-func (uc *companyUsecase) CreateCompany(companyCreate dto.CompanyCreate) *utils.AppError {
+func (uc *companyService) CreateCompany(companyCreate dto.CompanyCreate) *utils.AppError {
 	err := uc.companyRepository.Create(companyCreate)
 	if err != nil {
 		return err

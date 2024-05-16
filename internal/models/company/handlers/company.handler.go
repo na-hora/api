@@ -1,29 +1,29 @@
-package controllers
+package handlers
 
 import (
 	"encoding/json"
 	"na-hora/api/internal/dto"
-	usecases "na-hora/api/internal/models/company/usecases"
+	"na-hora/api/internal/models/company/services"
 
 	"net/http"
 )
 
-type CompanyController interface {
+type CompanyHandler interface {
 	Register(w http.ResponseWriter, r *http.Request)
 }
 
-type companyController struct {
-	companyUsecase usecases.CompanyUsecase
+type companyHandler struct {
+	companyService services.CompanyService
 }
 
-func GetCompanyController() CompanyController {
-	companyUsecase := usecases.GetCompanyUsecase()
-	return &companyController{
-		companyUsecase,
+func GetCompanyHandler() CompanyHandler {
+	companyService := services.GetCompanyService()
+	return &companyHandler{
+		companyService,
 	}
 }
 
-func (c *companyController) Register(w http.ResponseWriter, r *http.Request) {
+func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var companyPayload dto.CompanyCreate
 
 	err := json.NewDecoder(r.Body).Decode(&companyPayload)
@@ -39,7 +39,7 @@ func (c *companyController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appErr = c.companyUsecase.CreateCompany(companyPayload)
+	appErr = c.companyService.CreateCompany(companyPayload)
 
 	if appErr != nil {
 		w.WriteHeader(appErr.StatusCode)
