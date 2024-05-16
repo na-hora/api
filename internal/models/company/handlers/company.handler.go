@@ -34,16 +34,13 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	appErr := utils.ValidateCNPJ(companyPayload.CNPJ)
 	if appErr != nil {
-		w.WriteHeader(appErr.StatusCode)
-		json.NewEncoder(w).Encode(appErr.Message)
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
 	}
 
 	appErr = c.companyService.CreateCompany(companyPayload)
-
 	if appErr != nil {
-		w.WriteHeader(appErr.StatusCode)
-		json.NewEncoder(w).Encode(appErr.Message)
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
 	}
 }
