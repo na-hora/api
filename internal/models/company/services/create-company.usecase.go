@@ -1,13 +1,14 @@
 package services
 
 import (
-	"na-hora/api/internal/dto"
+	"na-hora/api/internal/entity"
+	"na-hora/api/internal/models/company/dtos"
 	repositories "na-hora/api/internal/models/company/repositories"
 	"na-hora/api/internal/utils"
 )
 
 type CompanyService interface {
-	CreateCompany(companyCreate dto.CompanyCreate) *utils.AppError
+	CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
 }
 
 type companyService struct {
@@ -21,11 +22,11 @@ func GetCompanyService() CompanyService {
 	}
 }
 
-func (uc *companyService) CreateCompany(companyCreate dto.CompanyCreate) *utils.AppError {
-	err := uc.companyRepository.Create(companyCreate)
+func (uc *companyService) CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
+	companyCreated, err := uc.companyRepository.Create(companyCreate)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return companyCreated, nil
 }

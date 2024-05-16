@@ -2,8 +2,8 @@ package repositories
 
 import (
 	config "na-hora/api/configs"
-	"na-hora/api/internal/dto"
 	"na-hora/api/internal/entity"
+	"na-hora/api/internal/models/company/dtos"
 	"na-hora/api/internal/utils"
 	"net/http"
 
@@ -11,7 +11,7 @@ import (
 )
 
 type CompanyRepository interface {
-	Create(dto.CompanyCreate) *utils.AppError
+	Create(dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
 }
 
 type companyRepository struct {
@@ -23,9 +23,9 @@ func GetCompanyRepository() CompanyRepository {
 	return &companyRepository{db}
 }
 
-func (cr *companyRepository) Create(insert dto.CompanyCreate) *utils.AppError {
+func (cr *companyRepository) Create(insert dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
 	insertValue := entity.Company{
-		CNPJ:        insert.Cnpj,
+		CNPJ:        insert.CNPJ,
 		Name:        insert.Name,
 		FantasyName: insert.FantasyName,
 		Email:       insert.Email,
@@ -35,13 +35,12 @@ func (cr *companyRepository) Create(insert dto.CompanyCreate) *utils.AppError {
 	}
 
 	data := cr.db.Create(&insertValue)
-
 	if data.Error != nil {
-		return &utils.AppError{
+		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
 
-	return nil
+	return &insertValue, nil
 }

@@ -38,9 +38,15 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appErr = c.companyService.CreateCompany(companyPayload)
-	if appErr != nil {
-		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+	company, serviceErr := c.companyService.CreateCompany(companyPayload)
+	if serviceErr != nil {
+		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
 		return
 	}
+
+	response := &companyDTOs.CreateCompanyResponse{
+		ID: company.ID,
+	}
+
+	utils.ResponseJSON(w, http.StatusCreated, response)
 }
