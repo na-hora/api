@@ -6,6 +6,8 @@ import (
 	"na-hora/api/internal/models/company/services"
 	"na-hora/api/internal/utils"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type CompanyHandler interface {
@@ -29,6 +31,13 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&companyPayload)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	validate := validator.New()
+	err = validate.Struct(companyPayload)
+	if err != nil {
+		utils.ResponseValidationErrors(err, w)
 		return
 	}
 
