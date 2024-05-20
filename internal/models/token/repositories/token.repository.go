@@ -43,7 +43,7 @@ func (t *tokenRepository) Generate(note string) (*entity.Token, *utils.AppError)
 
 func (t *tokenRepository) GetByKey(key uuid.UUID) (*entity.Token, *utils.AppError) {
 	var token entity.Token
-	data := t.db.Where("key = ?", key).First(&token)
+	data := t.db.Where("key = ? and used = false", key).First(&token)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
