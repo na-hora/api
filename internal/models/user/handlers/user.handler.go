@@ -32,7 +32,7 @@ func (u *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validate := validator.New()
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(userPayload)
 	if err != nil {
 		utils.ResponseValidationErrors(err, w)

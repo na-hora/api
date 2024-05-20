@@ -8,7 +8,7 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 )
 
@@ -36,7 +36,7 @@ func (th *tokenHandler) GenerateRegisterLink(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	validate := validator.New()
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(tokenPayload)
 	if err != nil {
 		utils.ResponseValidationErrors(err, w)
