@@ -10,7 +10,7 @@ func HashPassword(password string) (string, *AppError) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
 		return "", &AppError{
-			Message:    "invalid password",
+			Message:    "error hashing password",
 			StatusCode: http.StatusInternalServerError,
 		}
 	}

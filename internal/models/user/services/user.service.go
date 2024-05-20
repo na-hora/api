@@ -23,6 +23,17 @@ func GetUserService() UserService {
 }
 
 func (us *userService) Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
+
+	hash, passwordError := utils.HashPassword(userCreate.Password)
+	if passwordError != nil {
+		return nil, &utils.AppError{
+			Message:    passwordError.Message,
+			StatusCode: passwordError.StatusCode,
+		}
+	}
+
+	userCreate.Password = hash
+
 	userCreated, err := us.userRepository.Create(userCreate)
 	if err != nil {
 		return nil, err

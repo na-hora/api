@@ -3,7 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	companyDTOs "na-hora/api/internal/models/company/dtos"
-	"na-hora/api/internal/models/company/services"
+	companyServices "na-hora/api/internal/models/company/services"
+	userDTOs "na-hora/api/internal/models/user/dtos"
+	userServices "na-hora/api/internal/models/user/services"
 	"na-hora/api/internal/utils"
 	"net/http"
 
@@ -15,13 +17,16 @@ type CompanyHandler interface {
 }
 
 type companyHandler struct {
-	companyService services.CompanyService
+	companyService companyServices.CompanyService
+	userService    userServices.UserService
 }
 
 func GetCompanyHandler() CompanyHandler {
-	companyService := services.GetCompanyService()
+	companyService := companyServices.GetCompanyService()
+	userService := userServices.GetUserService()
 	return &companyHandler{
 		companyService,
+		userService,
 	}
 }
 
@@ -60,6 +65,16 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 			utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
 			return
 		}
+	}
+
+	_, userErr := c.userService.Create(userDTOs.CreateUserRequestBody{
+		Username:  companyPayload.Email,
+		Password:  companyPayload.Password,
+		CompanyID: company.ID,
+	})
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
 	}
 
 	response := &companyDTOs.CreateCompanyResponse{

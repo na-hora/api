@@ -39,14 +39,6 @@ func (u *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	hash, passwordError := utils.HashPassword(userPayload.Password)
-	if passwordError != nil {
-		utils.ResponseJSON(w, passwordError.StatusCode, passwordError.Message)
-		return
-	}
-
-	userPayload.Password = hash
-
 	user, serviceErr := u.userService.Create(userPayload)
 	if serviceErr != nil {
 		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
