@@ -7,11 +7,13 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type CompanyRepository interface {
 	Create(dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
+	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError)
 }
 
 type companyRepository struct {
@@ -32,6 +34,27 @@ func (cr *companyRepository) Create(insert dtos.CreateCompanyRequestBody) (*enti
 		Phone:       insert.Phone,
 		AvatarUrl:   insert.AvatarUrl,
 		CategoryID:  1, // TODO: enum
+	}
+
+	data := cr.db.Create(&insertValue)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &insertValue, nil
+}
+
+func (cr *companyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
+	insertValue := entity.CompanyAddress{
+		CompanyID:  companyID,
+		Street:     insert.Street,
+		Number:     insert.Number,
+		Complement: insert.Complement,
+		ZipCode:    insert.ZipCode,
+		CityID:     insert.CityID,
 	}
 
 	data := cr.db.Create(&insertValue)

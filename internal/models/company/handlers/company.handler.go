@@ -34,7 +34,7 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	validate := validator.New()
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(companyPayload)
 	if err != nil {
 		utils.ResponseValidationErrors(err, w)
@@ -51,6 +51,15 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if serviceErr != nil {
 		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
 		return
+	}
+
+	if companyPayload.Address != nil {
+		_, serviceErr = c.companyService.CreateAddress(company.ID, *companyPayload.Address)
+
+		if serviceErr != nil {
+			utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
+			return
+		}
 	}
 
 	response := &companyDTOs.CreateCompanyResponse{
