@@ -21,9 +21,9 @@ func main() {
 
 	initializers.Routes(r)
 
-	port := viper.Get("WEB_SERVER_PORT")
+	port := viper.Get("SERVER_PORT")
 
-	fmt.Printf("Server starting on port :%s\n", port)
+	fmt.Printf("Server starting on port: %s\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%s", port), r)
 	if err != nil {
 		panic(err)
