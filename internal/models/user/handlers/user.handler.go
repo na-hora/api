@@ -28,7 +28,7 @@ func (u *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&userPayload)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		utils.ResponseJSON(w, http.StatusBadRequest, "Invalid body")
 		return
 	}
 
