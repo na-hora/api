@@ -6,11 +6,14 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type TokenRepository interface {
 	Generate(note string) (*entity.Token, *utils.AppError)
+	GetByKey(key uuid.UUID) (*entity.Token, *utils.AppError)
+	MarkAsUsed(key uuid.UUID) *utils.AppError
 }
 
 type tokenRepository struct {
@@ -36,4 +39,27 @@ func (t *tokenRepository) Generate(note string) (*entity.Token, *utils.AppError)
 	}
 
 	return &insertValue, nil
+}
+
+func (t *tokenRepository) GetByKey(key uuid.UUID) (*entity.Token, *utils.AppError) {
+	var token entity.Token
+	data := t.db.Where("key = ?", key).First(&token)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return &token, nil
+}
+
+func (t *tokenRepository) MarkAsUsed(key uuid.UUID) *utils.AppError {
+	data := t.db.Model(&entity.Token{}).Where("key = ?", key).Update("used", true)
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return nil
 }

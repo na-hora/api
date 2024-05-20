@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	companyDTOs "na-hora/api/internal/models/company/dtos"
 	companyServices "na-hora/api/internal/models/company/services"
+	tokenServices "na-hora/api/internal/models/token/services"
 	userDTOs "na-hora/api/internal/models/user/dtos"
 	userServices "na-hora/api/internal/models/user/services"
 	"na-hora/api/internal/utils"
@@ -19,14 +20,17 @@ type CompanyHandler interface {
 type companyHandler struct {
 	companyService companyServices.CompanyService
 	userService    userServices.UserService
+	tokenService   tokenServices.TokenService
 }
 
 func GetCompanyHandler() CompanyHandler {
 	companyService := companyServices.GetCompanyService()
 	userService := userServices.GetUserService()
+	tokenService := tokenServices.GetTokenService()
 	return &companyHandler{
 		companyService,
 		userService,
+		tokenService,
 	}
 }
 
@@ -43,6 +47,13 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	err = validate.Struct(companyPayload)
 	if err != nil {
 		utils.ResponseValidationErrors(err, w)
+		return
+	}
+
+	tokenErr := c.tokenService.UseToken(companyPayload.Validator)
+
+	if tokenErr != nil {
+		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
 		return
 	}
 
