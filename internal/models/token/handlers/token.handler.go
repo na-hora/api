@@ -7,9 +7,9 @@ import (
 	"na-hora/api/internal/models/token/services"
 	"na-hora/api/internal/utils"
 	"net/http"
-	"os"
 
 	"github.com/go-playground/validator"
+	"github.com/spf13/viper"
 )
 
 type TokenHandler interface {
@@ -50,7 +50,7 @@ func (th *tokenHandler) GenerateRegisterLink(w http.ResponseWriter, r *http.Requ
 	}
 
 	response := &tokenDTOs.GenerateTokenResponse{
-		URL: fmt.Sprintf("%s/register/%s", os.Getenv("API_PUBLIC_URL"), token.Key),
+		URL: fmt.Sprintf("%s/company/register?token=%s", viper.Get("API_PUBLIC_URL"), token.Key),
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, response)
