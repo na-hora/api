@@ -39,7 +39,7 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&companyPayload)
 	if err != nil {
-		utils.ResponseJSON(w, http.StatusBadRequest, "Invalid body")
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -50,8 +50,7 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenErr := c.tokenService.UseToken(companyPayload.Validator)
-
+	validatorFound, tokenErr := c.tokenService.GetValidToken(companyPayload.Validator)
 	if tokenErr != nil {
 		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
 		return
@@ -85,6 +84,13 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	})
 	if userErr != nil {
 		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	tokenErr = c.tokenService.UseToken(validatorFound.Key, company.ID)
+
+	if tokenErr != nil {
+		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
 		return
 	}
 

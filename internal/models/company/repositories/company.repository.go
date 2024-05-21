@@ -49,12 +49,13 @@ func (cr *companyRepository) Create(insert dtos.CreateCompanyRequestBody) (*enti
 
 func (cr *companyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
 	insertValue := entity.CompanyAddress{
-		CompanyID:  companyID,
-		Street:     insert.Street,
-		Number:     insert.Number,
-		Complement: insert.Complement,
-		ZipCode:    insert.ZipCode,
-		CityID:     insert.CityID,
+		CompanyID:    companyID,
+		Neighborhood: insert.Neighborhood,
+		Street:       insert.Street,
+		Number:       insert.Number,
+		Complement:   insert.Complement,
+		ZipCode:      insert.ZipCode,
+		CityID:       insert.CityID,
 	}
 
 	data := cr.db.Create(&insertValue)

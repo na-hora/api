@@ -13,7 +13,7 @@ import (
 type TokenRepository interface {
 	Generate(note string) (*entity.Token, *utils.AppError)
 	GetByKey(key uuid.UUID) (*entity.Token, *utils.AppError)
-	MarkAsUsed(key uuid.UUID) *utils.AppError
+	MarkAsUsed(key uuid.UUID, companyID uuid.UUID) *utils.AppError
 }
 
 type tokenRepository struct {
@@ -45,6 +45,13 @@ func (t *tokenRepository) GetByKey(key uuid.UUID) (*entity.Token, *utils.AppErro
 	var token entity.Token
 	data := t.db.Where("key = ? and used = false", key).First(&token)
 	if data.Error != nil {
+		if data.Error == gorm.ErrRecordNotFound {
+			return nil, &utils.AppError{
+				Message:    "Invalid validator",
+				StatusCode: http.StatusUnauthorized,
+			}
+		}
+
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
 			StatusCode: http.StatusInternalServerError,
@@ -53,8 +60,8 @@ func (t *tokenRepository) GetByKey(key uuid.UUID) (*entity.Token, *utils.AppErro
 	return &token, nil
 }
 
-func (t *tokenRepository) MarkAsUsed(key uuid.UUID) *utils.AppError {
-	data := t.db.Model(&entity.Token{}).Where("key = ?", key).Update("used", true)
+func (t *tokenRepository) MarkAsUsed(key uuid.UUID, companyID uuid.UUID) *utils.AppError {
+	data := t.db.Model(&entity.Token{}).Where("key = ?", key).Update("used", true).Update("company_id", companyID)
 	if data.Error != nil {
 		return &utils.AppError{
 			Message:    data.Error.Error(),
