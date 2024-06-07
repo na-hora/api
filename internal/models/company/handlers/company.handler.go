@@ -77,25 +77,35 @@ func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	_, userErr := c.userService.Create(userDTOs.CreateUserRequestBody{
-		Username:  companyPayload.Email,
-		Password:  companyPayload.Password,
-		CompanyID: company.ID,
-	})
-	if userErr != nil {
-		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
-		return
-	}
-
 	tokenErr = c.tokenService.UseToken(validatorFound.Key, company.ID)
+
+	response := &companyDTOs.CreateCompanyResponse{
+		ID: company.ID,
+	}
 
 	if tokenErr != nil {
 		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
 		return
 	}
 
-	response := &companyDTOs.CreateCompanyResponse{
-		ID: company.ID,
+	userAlreadyExists, usernameErr := c.userService.GetByUsername(companyPayload.Email)
+	if usernameErr != nil {
+		utils.ResponseJSON(w, usernameErr.StatusCode, usernameErr.Message)
+		return
+	}
+
+	if userAlreadyExists != nil {
+		response.Inconsistency = "The company and address were created successfully, but the username was already taken"
+	} else {
+		_, userErr := c.userService.Create(userDTOs.CreateUserRequestBody{
+			Username:  companyPayload.Email,
+			Password:  companyPayload.Password,
+			CompanyID: company.ID,
+		})
+		if userErr != nil {
+			utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+			return
+		}
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, response)

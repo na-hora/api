@@ -9,6 +9,7 @@ import (
 
 type UserService interface {
 	Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError)
+	GetByUsername(username string) (*entity.User, *utils.AppError)
 }
 
 type userService struct {
@@ -39,4 +40,12 @@ func (us *userService) Create(userCreate dtos.CreateUserRequestBody) (*entity.Us
 		return nil, err
 	}
 	return userCreated, nil
+}
+
+func (us *userService) GetByUsername(username string) (*entity.User, *utils.AppError) {
+	user, err := us.userRepository.GetByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
