@@ -27,3 +27,7 @@ func ConnectToDB() {
 
 	fmt.Println("The database is connected...")
 }
+
+func StartTransaction() *gorm.DB {
+	return DB.Begin()
+}

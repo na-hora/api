@@ -7,12 +7,13 @@ import (
 	"na-hora/api/internal/utils"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type TokenServiceInterface interface {
 	Generate(data tokenDTOs.GenerateTokenRequestBody) (*entity.Token, *utils.AppError)
 	GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppError)
-	UseToken(key uuid.UUID, companyID uuid.UUID) *utils.AppError
+	UseToken(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError
 }
 
 type TokenService struct {
@@ -41,8 +42,8 @@ func (ts *TokenService) GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppE
 	return tokenExistent, nil
 }
 
-func (ts *TokenService) UseToken(key uuid.UUID, companyID uuid.UUID) *utils.AppError {
-	err := ts.tokenRepository.MarkAsUsed(key, companyID)
+func (ts *TokenService) UseToken(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError {
+	err := ts.tokenRepository.MarkAsUsed(key, companyID, tx)
 
 	if err != nil {
 		return err

@@ -68,34 +68,39 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	company, serviceErr := c.companyService.CreateCompany(companyPayload)
-	if serviceErr != nil {
-		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
+	tx := config.StartTransaction()
+	company, companyErr := c.companyService.CreateCompany(companyPayload, tx)
+	if companyErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, companyErr.StatusCode, companyErr.Message)
 		return
 	}
 
 	if companyPayload.Address != nil {
-		_, serviceErr = c.companyService.CreateAddress(company.ID, *companyPayload.Address)
+		_, addressErr := c.companyService.CreateAddress(company.ID, *companyPayload.Address, tx)
 
-		if serviceErr != nil {
-			utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
+		if addressErr != nil {
+			tx.Rollback()
+			utils.ResponseJSON(w, addressErr.StatusCode, addressErr.Message)
 			return
 		}
 	}
 
-	tokenErr = c.tokenService.UseToken(validatorFound.Key, company.ID)
+	tokenErr = c.tokenService.UseToken(validatorFound.Key, company.ID, tx)
 
 	response := &companyDTOs.CreateCompanyResponse{
 		ID: company.ID,
 	}
 
 	if tokenErr != nil {
+		tx.Rollback()
 		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
 		return
 	}
 
 	userAlreadyExists, usernameErr := c.userService.GetByUsername(companyPayload.Email)
 	if usernameErr != nil {
+		tx.Rollback()
 		utils.ResponseJSON(w, usernameErr.StatusCode, usernameErr.Message)
 		return
 	}
@@ -107,11 +112,18 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Username:  companyPayload.Email,
 			Password:  companyPayload.Password,
 			CompanyID: company.ID,
-		})
+		}, tx)
 		if userErr != nil {
+			tx.Rollback()
 			utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
 			return
 		}
+	}
+
+	dbInfo := tx.Commit()
+	if dbInfo.Error != nil {
+		utils.ResponseJSON(w, http.StatusInternalServerError, dbInfo.Error.Error())
+		return
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, response)

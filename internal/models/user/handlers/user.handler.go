@@ -42,7 +42,7 @@ func (u *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, serviceErr := u.userService.Create(userPayload)
+	user, serviceErr := u.userService.Create(userPayload, nil)
 	if serviceErr != nil {
 		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
 		return

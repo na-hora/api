@@ -10,7 +10,7 @@ import (
 )
 
 type UserRepositoryInterface interface {
-	Create(dtos.CreateUserRequestBody) (*entity.User, *utils.AppError)
+	Create(insert dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
 }
 
@@ -22,14 +22,18 @@ func GetUserRepository(db *gorm.DB) UserRepositoryInterface {
 	return &UserRepository{db}
 }
 
-func (ur *UserRepository) Create(insert dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
+func (ur *UserRepository) Create(insert dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError) {
+	if tx == nil {
+		tx = ur.db
+	}
+
 	insertValue := entity.User{
 		Username:  insert.Username,
 		Password:  insert.Password,
 		CompanyID: insert.CompanyID,
 	}
 
-	data := ur.db.Create(&insertValue)
+	data := tx.Create(&insertValue)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),

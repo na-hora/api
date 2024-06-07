@@ -5,10 +5,12 @@ import (
 	"na-hora/api/internal/models/user/dtos"
 	repositories "na-hora/api/internal/models/user/repositories"
 	"na-hora/api/internal/utils"
+
+	"gorm.io/gorm"
 )
 
 type UserServiceInterface interface {
-	Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError)
+	Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
 }
 
@@ -22,7 +24,7 @@ func GetUserService(repo repositories.UserRepositoryInterface) UserServiceInterf
 	}
 }
 
-func (us *UserService) Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
+func (us *UserService) Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError) {
 
 	hash, passwordError := utils.HashPassword(userCreate.Password)
 	if passwordError != nil {
@@ -34,7 +36,7 @@ func (us *UserService) Create(userCreate dtos.CreateUserRequestBody) (*entity.Us
 
 	userCreate.Password = hash
 
-	userCreated, err := us.userRepository.Create(userCreate)
+	userCreated, err := us.userRepository.Create(userCreate, tx)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +45,10 @@ func (us *UserService) Create(userCreate dtos.CreateUserRequestBody) (*entity.Us
 
 func (us *UserService) GetByUsername(username string) (*entity.User, *utils.AppError) {
 	user, err := us.userRepository.GetByUsername(username)
+
 	if err != nil {
 		return nil, err
 	}
+
 	return user, nil
 }

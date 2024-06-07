@@ -7,11 +7,12 @@ import (
 	"na-hora/api/internal/utils"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type CompanyServiceInterface interface {
-	CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
-	CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError)
+	CreateCompany(companyCreate dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError)
+	CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
 }
 
 type CompanyService struct {
@@ -24,8 +25,8 @@ func GetCompanyService(repo repositories.CompanyRepositoryInterface) CompanyServ
 	}
 }
 
-func (cs *CompanyService) CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
-	companyCreated, err := cs.companyRepository.Create(companyCreate)
+func (cs *CompanyService) CreateCompany(companyCreate dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError) {
+	companyCreated, err := cs.companyRepository.Create(companyCreate, tx)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +34,8 @@ func (cs *CompanyService) CreateCompany(companyCreate dtos.CreateCompanyRequestB
 	return companyCreated, nil
 }
 
-func (cs *CompanyService) CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
-	companyAddressCreated, err := cs.companyRepository.CreateAddress(companyID, addressCreate)
+func (cs *CompanyService) CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError) {
+	companyAddressCreated, err := cs.companyRepository.CreateAddress(companyID, addressCreate, tx)
 	if err != nil {
 		return nil, err
 	}

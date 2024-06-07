@@ -12,7 +12,7 @@ import (
 type TokenRepositoryInterface interface {
 	Generate(note string) (*entity.Token, *utils.AppError)
 	GetByKey(key uuid.UUID) (*entity.Token, *utils.AppError)
-	MarkAsUsed(key uuid.UUID, companyID uuid.UUID) *utils.AppError
+	MarkAsUsed(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError
 }
 
 type TokenRepository struct {
@@ -58,8 +58,12 @@ func (t *TokenRepository) GetByKey(key uuid.UUID) (*entity.Token, *utils.AppErro
 	return &token, nil
 }
 
-func (t *TokenRepository) MarkAsUsed(key uuid.UUID, companyID uuid.UUID) *utils.AppError {
-	data := t.db.Model(&entity.Token{}).Where("key = ?", key).Update("used", true).Update("company_id", companyID)
+func (t *TokenRepository) MarkAsUsed(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = t.db
+	}
+
+	data := tx.Model(&entity.Token{}).Where("key = ?", key).Update("used", true).Update("company_id", companyID)
 	if data.Error != nil {
 		return &utils.AppError{
 			Message:    data.Error.Error(),

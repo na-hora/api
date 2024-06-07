@@ -11,8 +11,8 @@ import (
 )
 
 type CompanyRepositoryInterface interface {
-	Create(dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
-	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError)
+	Create(dtos.CreateCompanyRequestBody, *gorm.DB) (*entity.Company, *utils.AppError)
+	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
 }
 
 type CompanyRepository struct {
@@ -23,7 +23,11 @@ func GetCompanyRepository(db *gorm.DB) CompanyRepositoryInterface {
 	return &CompanyRepository{db}
 }
 
-func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
+func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError) {
+	if tx == nil {
+		tx = cr.db
+	}
+
 	insertValue := entity.Company{
 		CNPJ:        insert.CNPJ,
 		Name:        insert.Name,
@@ -34,7 +38,7 @@ func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody) (*enti
 		CategoryID:  1, // TODO: enum
 	}
 
-	data := cr.db.Create(&insertValue)
+	data := tx.Create(&insertValue)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
@@ -45,7 +49,11 @@ func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody) (*enti
 	return &insertValue, nil
 }
 
-func (cr *CompanyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
+func (cr *CompanyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError) {
+	if tx == nil {
+		tx = cr.db
+	}
+
 	insertValue := entity.CompanyAddress{
 		CompanyID:    companyID,
 		Neighborhood: insert.Neighborhood,
@@ -56,7 +64,7 @@ func (cr *CompanyRepository) CreateAddress(companyID uuid.UUID, insert dtos.Crea
 		CityID:       insert.CityID,
 	}
 
-	data := cr.db.Create(&insertValue)
+	data := tx.Create(&insertValue)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
