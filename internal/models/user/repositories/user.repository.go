@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	config "na-hora/api/configs"
 	"na-hora/api/internal/entity"
 	"na-hora/api/internal/models/user/dtos"
 	"na-hora/api/internal/utils"
@@ -10,21 +9,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository interface {
+type UserRepositoryInterface interface {
 	Create(dtos.CreateUserRequestBody) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
 }
 
-type userRepository struct {
+type UserRepository struct {
 	db *gorm.DB
 }
 
-func GetUserRepository() UserRepository {
-	db := config.DB
-	return &userRepository{db}
+func GetUserRepository(db *gorm.DB) UserRepositoryInterface {
+	return &UserRepository{db}
 }
 
-func (ur *userRepository) Create(insert dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
+func (ur *UserRepository) Create(insert dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
 	insertValue := entity.User{
 		Username:  insert.Username,
 		Password:  insert.Password,
@@ -42,7 +40,7 @@ func (ur *userRepository) Create(insert dtos.CreateUserRequestBody) (*entity.Use
 	return &insertValue, nil
 }
 
-func (ur *userRepository) GetByUsername(username string) (*entity.User, *utils.AppError) {
+func (ur *UserRepository) GetByUsername(username string) (*entity.User, *utils.AppError) {
 	var user entity.User
 	data := ur.db.Where("username = ?", username).First(&user)
 	if data.Error != nil {

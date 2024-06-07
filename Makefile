@@ -15,3 +15,6 @@ seed:
 
 m-apply:
 		atlas migrate hash; atlas migrate apply --url ${DB_URL}?sslmode=disable
+
+wire:
+		cd internal/injector && wire && cd ../..

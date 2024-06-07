@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	config "na-hora/api/configs"
 	"na-hora/api/internal/entity"
 	"na-hora/api/internal/models/company/dtos"
 	"na-hora/api/internal/utils"
@@ -11,21 +10,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type CompanyRepository interface {
+type CompanyRepositoryInterface interface {
 	Create(dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
 	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError)
 }
 
-type companyRepository struct {
+type CompanyRepository struct {
 	db *gorm.DB
 }
 
-func GetCompanyRepository() CompanyRepository {
-	db := config.DB
-	return &companyRepository{db}
+func GetCompanyRepository(db *gorm.DB) CompanyRepositoryInterface {
+	return &CompanyRepository{db}
 }
 
-func (cr *companyRepository) Create(insert dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
+func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
 	insertValue := entity.Company{
 		CNPJ:        insert.CNPJ,
 		Name:        insert.Name,
@@ -47,7 +45,7 @@ func (cr *companyRepository) Create(insert dtos.CreateCompanyRequestBody) (*enti
 	return &insertValue, nil
 }
 
-func (cr *companyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
+func (cr *CompanyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
 	insertValue := entity.CompanyAddress{
 		CompanyID:    companyID,
 		Neighborhood: insert.Neighborhood,

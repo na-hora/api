@@ -2,39 +2,45 @@ package handlers
 
 import (
 	"encoding/json"
+	config "na-hora/api/configs"
+	"na-hora/api/internal/injector"
+
 	companyDTOs "na-hora/api/internal/models/company/dtos"
+	userDTOs "na-hora/api/internal/models/user/dtos"
+
 	companyServices "na-hora/api/internal/models/company/services"
 	tokenServices "na-hora/api/internal/models/token/services"
-	userDTOs "na-hora/api/internal/models/user/dtos"
 	userServices "na-hora/api/internal/models/user/services"
+
 	"na-hora/api/internal/utils"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
 )
 
-type CompanyHandler interface {
+type CompanyHandlerInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 }
 
-type companyHandler struct {
-	companyService companyServices.CompanyService
-	userService    userServices.UserService
-	tokenService   tokenServices.TokenService
+type CompanyHandler struct {
+	companyService companyServices.CompanyServiceInterface
+	userService    userServices.UserServiceInterface
+	tokenService   tokenServices.TokenServiceInterface
 }
 
-func GetCompanyHandler() CompanyHandler {
-	companyService := companyServices.GetCompanyService()
-	userService := userServices.GetUserService()
-	tokenService := tokenServices.GetTokenService()
-	return &companyHandler{
+func GetCompanyHandler() CompanyHandlerInterface {
+	companyService := injector.InitializeCompanyService(config.DB)
+	userService := injector.InitializeUserService(config.DB)
+	tokenService := injector.InitializeTokenService(config.DB)
+
+	return &CompanyHandler{
 		companyService,
 		userService,
 		tokenService,
 	}
 }
 
-func (c *companyHandler) Register(w http.ResponseWriter, r *http.Request) {
+func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var companyPayload companyDTOs.CreateCompanyRequestBody
 
 	err := json.NewDecoder(r.Body).Decode(&companyPayload)

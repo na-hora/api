@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"github.com/go-chi/chi"
-
 	"na-hora/api/internal/models/company/handlers"
+
+	"github.com/go-chi/chi"
 )
 
 func CompanyRoutes(r chi.Router) {

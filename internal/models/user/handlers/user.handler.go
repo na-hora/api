@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"encoding/json"
+	config "na-hora/api/configs"
+	"na-hora/api/internal/injector"
 	userDTOs "na-hora/api/internal/models/user/dtos"
 	"na-hora/api/internal/models/user/services"
 	"na-hora/api/internal/utils"
@@ -15,11 +17,12 @@ type UserHandler interface {
 }
 
 type userHandler struct {
-	userService services.UserService
+	userService services.UserServiceInterface
 }
 
-func GetUserHandler() UserHandler {
-	userService := services.GetUserService()
+func GetUserHandler() *userHandler {
+	userService := injector.InitializeUserService(config.DB)
+
 	return &userHandler{userService}
 }
 

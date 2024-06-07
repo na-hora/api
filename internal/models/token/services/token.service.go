@@ -9,24 +9,23 @@ import (
 	"github.com/google/uuid"
 )
 
-type TokenService interface {
+type TokenServiceInterface interface {
 	Generate(data tokenDTOs.GenerateTokenRequestBody) (*entity.Token, *utils.AppError)
 	GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppError)
 	UseToken(key uuid.UUID, companyID uuid.UUID) *utils.AppError
 }
 
-type tokenService struct {
-	tokenRepository repositories.TokenRepository
+type TokenService struct {
+	tokenRepository repositories.TokenRepositoryInterface
 }
 
-func GetTokenService() TokenService {
-	tokenRepository := repositories.GetTokenRepository()
-	return &tokenService{
-		tokenRepository,
+func GetTokenService(repo repositories.TokenRepositoryInterface) TokenServiceInterface {
+	return &TokenService{
+		repo,
 	}
 }
 
-func (ts *tokenService) Generate(data tokenDTOs.GenerateTokenRequestBody) (*entity.Token, *utils.AppError) {
+func (ts *TokenService) Generate(data tokenDTOs.GenerateTokenRequestBody) (*entity.Token, *utils.AppError) {
 	tokenCreated, err := ts.tokenRepository.Generate(data.Note)
 	if err != nil {
 		return nil, err
@@ -34,7 +33,7 @@ func (ts *tokenService) Generate(data tokenDTOs.GenerateTokenRequestBody) (*enti
 	return tokenCreated, nil
 }
 
-func (ts *tokenService) GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppError) {
+func (ts *TokenService) GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppError) {
 	tokenExistent, err := ts.tokenRepository.GetByKey(key)
 	if err != nil {
 		return nil, err
@@ -42,7 +41,7 @@ func (ts *tokenService) GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppE
 	return tokenExistent, nil
 }
 
-func (ts *tokenService) UseToken(key uuid.UUID, companyID uuid.UUID) *utils.AppError {
+func (ts *TokenService) UseToken(key uuid.UUID, companyID uuid.UUID) *utils.AppError {
 	err := ts.tokenRepository.MarkAsUsed(key, companyID)
 
 	if err != nil {

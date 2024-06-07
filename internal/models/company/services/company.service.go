@@ -9,23 +9,22 @@ import (
 	"github.com/google/uuid"
 )
 
-type CompanyService interface {
+type CompanyServiceInterface interface {
 	CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError)
 	CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError)
 }
 
-type companyService struct {
-	companyRepository repositories.CompanyRepository
+type CompanyService struct {
+	companyRepository repositories.CompanyRepositoryInterface
 }
 
-func GetCompanyService() CompanyService {
-	companyRepo := repositories.GetCompanyRepository()
-	return &companyService{
-		companyRepo,
+func GetCompanyService(repo repositories.CompanyRepositoryInterface) CompanyServiceInterface {
+	return &CompanyService{
+		repo,
 	}
 }
 
-func (cs *companyService) CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
+func (cs *CompanyService) CreateCompany(companyCreate dtos.CreateCompanyRequestBody) (*entity.Company, *utils.AppError) {
 	companyCreated, err := cs.companyRepository.Create(companyCreate)
 	if err != nil {
 		return nil, err
@@ -34,7 +33,7 @@ func (cs *companyService) CreateCompany(companyCreate dtos.CreateCompanyRequestB
 	return companyCreated, nil
 }
 
-func (cs *companyService) CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
+func (cs *CompanyService) CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody) (*entity.CompanyAddress, *utils.AppError) {
 	companyAddressCreated, err := cs.companyRepository.CreateAddress(companyID, addressCreate)
 	if err != nil {
 		return nil, err

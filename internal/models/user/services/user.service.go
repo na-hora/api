@@ -7,23 +7,22 @@ import (
 	"na-hora/api/internal/utils"
 )
 
-type UserService interface {
+type UserServiceInterface interface {
 	Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
 }
 
-type userService struct {
-	userRepository repositories.UserRepository
+type UserService struct {
+	userRepository repositories.UserRepositoryInterface
 }
 
-func GetUserService() UserService {
-	userRepository := repositories.GetUserRepository()
-	return &userService{
-		userRepository,
+func GetUserService(repo repositories.UserRepositoryInterface) UserServiceInterface {
+	return &UserService{
+		repo,
 	}
 }
 
-func (us *userService) Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
+func (us *UserService) Create(userCreate dtos.CreateUserRequestBody) (*entity.User, *utils.AppError) {
 
 	hash, passwordError := utils.HashPassword(userCreate.Password)
 	if passwordError != nil {
@@ -42,7 +41,7 @@ func (us *userService) Create(userCreate dtos.CreateUserRequestBody) (*entity.Us
 	return userCreated, nil
 }
 
-func (us *userService) GetByUsername(username string) (*entity.User, *utils.AppError) {
+func (us *UserService) GetByUsername(username string) (*entity.User, *utils.AppError) {
 	user, err := us.userRepository.GetByUsername(username)
 	if err != nil {
 		return nil, err

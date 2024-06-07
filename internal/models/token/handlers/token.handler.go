@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	config "na-hora/api/configs"
+	"na-hora/api/internal/injector"
 	tokenDTOs "na-hora/api/internal/models/token/dtos"
 	"na-hora/api/internal/models/token/services"
 	"na-hora/api/internal/utils"
@@ -12,22 +14,22 @@ import (
 	"github.com/spf13/viper"
 )
 
-type TokenHandler interface {
+type TokenHandlerInterface interface {
 	GenerateRegisterLink(w http.ResponseWriter, r *http.Request)
 }
 
-type tokenHandler struct {
-	tokenService services.TokenService
+type TokenHandler struct {
+	tokenService services.TokenServiceInterface
 }
 
-func GetTokenHandler() TokenHandler {
-	tokenService := services.GetTokenService()
-	return &tokenHandler{
+func GetTokenHandler() TokenHandlerInterface {
+	tokenService := injector.InitializeTokenService(config.DB)
+	return &TokenHandler{
 		tokenService,
 	}
 }
 
-func (th *tokenHandler) GenerateRegisterLink(w http.ResponseWriter, r *http.Request) {
+func (th *TokenHandler) GenerateRegisterLink(w http.ResponseWriter, r *http.Request) {
 	var tokenPayload tokenDTOs.GenerateTokenRequestBody
 
 	err := json.NewDecoder(r.Body).Decode(&tokenPayload)
