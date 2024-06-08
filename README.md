@@ -43,3 +43,5 @@
 #### ```make m-generate --name=name-for-the-migration```
 #### And to apply it to the database use:
 #### ```make m-apply```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
