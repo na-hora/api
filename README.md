@@ -29,6 +29,7 @@
 #### # *5* Run ```make dev```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+<hr>
 
 ### :bulb: Project tips:
 
