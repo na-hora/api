@@ -19,7 +19,7 @@
 <p align="right">(<a href="#top">back to top</a>)</p>
 <hr>
 
-### :rocket: You can run this project following the steps below:
+## :rocket: You can run this project following the steps below:
 
 #### # *1* Clone the project from GitHub
 #### # *2* Run ```go mod tidy```
@@ -31,7 +31,7 @@
 <p align="right">(<a href="#top">back to top</a>)</p>
 <hr>
 
-### :bulb: Project tips:
+## :bulb: Project tips:
 
 #### You can build the project running:
 #### ```make build```
