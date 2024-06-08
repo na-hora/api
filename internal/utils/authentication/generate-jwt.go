@@ -3,13 +3,13 @@ package authentication
 import (
 	"na-hora/api/internal/utils"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/spf13/viper"
 )
 
-func CreateToken(username string) (string, *utils.AppError) {
+func GenerateToken(username string) (string, *utils.AppError) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": username,
 		"iss": "Na Hora",
@@ -17,7 +17,8 @@ func CreateToken(username string) (string, *utils.AppError) {
 		"iat": time.Now().Unix(),
 	})
 
-	token, err := claims.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	jwtSecret := viper.Get("JWT_SECRET").(string)
+	token, err := claims.SignedString([]byte(jwtSecret))
 	if err != nil {
 		return "", &utils.AppError{
 			Message:    err.Error(),

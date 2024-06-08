@@ -11,7 +11,7 @@ func ValidateCNPJ(cnpj string) *AppError {
 
 	if !r {
 		return &AppError{
-			Message:    "invalid CNPJ",
+			Message:    "invalid cnpj",
 			StatusCode: http.StatusBadRequest,
 		}
 	}

@@ -11,7 +11,7 @@ type User struct {
 
 	CompanyID uuid.UUID `json:"companyId" gorm:"not null"`
 	Username  string    `json:"username" gorm:"not null;unique"`
-	Password  string    `json:"password" gorm:"not null"`
+	Password  string    `json:"-" gorm:"not null"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`

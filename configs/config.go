@@ -34,5 +34,28 @@ func LoadConfig() (*conf, error) {
 		panic(err)
 	}
 
+	checkRequiredEnvs()
+
 	return cfg, err
+}
+
+func checkRequiredEnvs() {
+	requiredEnvs := []string{
+		"SERVER_PORT",
+		"DB_DRIVER",
+		"DB_HOST",
+		"DB_USER",
+		"DB_PASS",
+		"DB_NAME",
+		"DB_PORT",
+		"DB_URL",
+		"WEB_URL",
+		"JWT_SECRET",
+	}
+
+	for _, env := range requiredEnvs {
+		if viper.Get(env) == nil {
+			panic(env + " env not set")
+		}
+	}
 }

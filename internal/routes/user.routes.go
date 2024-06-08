@@ -11,5 +11,6 @@ func UserRoutes(r chi.Router) {
 
 	r.Route("/users", func(r chi.Router) {
 		r.Post("/register", userHandler.Register)
+		r.Post("/login", userHandler.Login)
 	})
 }

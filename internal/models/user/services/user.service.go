@@ -5,6 +5,7 @@ import (
 	"na-hora/api/internal/models/user/dtos"
 	repositories "na-hora/api/internal/models/user/repositories"
 	"na-hora/api/internal/utils"
+	"net/http"
 
 	"gorm.io/gorm"
 )
@@ -12,6 +13,7 @@ import (
 type UserServiceInterface interface {
 	Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
+	CheckPassword(userLogin dtos.LoginUserRequestBody) (*entity.User, *utils.AppError)
 }
 
 type UserService struct {
@@ -25,7 +27,6 @@ func GetUserService(repo repositories.UserRepositoryInterface) UserServiceInterf
 }
 
 func (us *UserService) Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError) {
-
 	hash, passwordError := utils.HashPassword(userCreate.Password)
 	if passwordError != nil {
 		return nil, &utils.AppError{
@@ -48,6 +49,30 @@ func (us *UserService) GetByUsername(username string) (*entity.User, *utils.AppE
 
 	if err != nil {
 		return nil, err
+	}
+
+	return user, nil
+}
+
+func (us *UserService) CheckPassword(userLogin dtos.LoginUserRequestBody) (*entity.User, *utils.AppError) {
+	user, err := us.userRepository.GetByUsername(userLogin.Username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if user == nil {
+		return nil, &utils.AppError{
+			Message:    "user not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	if !utils.CheckPasswordHash(userLogin.Password, user.Password) {
+		return nil, &utils.AppError{
+			Message:    "wrong password",
+			StatusCode: http.StatusUnauthorized,
+		}
 	}
 
 	return user, nil

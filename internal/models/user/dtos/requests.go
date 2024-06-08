@@ -7,3 +7,8 @@ type CreateUserRequestBody struct {
 	Password  string    `json:"password" gorm:"not null" validate:"required"`
 	CompanyID uuid.UUID `json:"companyId" gorm:"not null" validate:"required"`
 }
+
+type LoginUserRequestBody struct {
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}

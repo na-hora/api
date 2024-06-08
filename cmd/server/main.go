@@ -18,7 +18,6 @@ func init() {
 
 func main() {
 	r := chi.NewRouter()
-
 	initializers.Routes(r)
 
 	port := viper.Get("SERVER_PORT")
