@@ -7,11 +7,13 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type UserServiceInterface interface {
 	Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError)
+	GetByID(ID uuid.UUID) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
 	CheckPassword(userLogin dtos.LoginUserRequestBody) (*entity.User, *utils.AppError)
 }
@@ -42,6 +44,16 @@ func (us *UserService) Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB
 		return nil, err
 	}
 	return userCreated, nil
+}
+
+func (us *UserService) GetByID(ID uuid.UUID) (*entity.User, *utils.AppError) {
+	user, err := us.userRepository.GetByID(ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (us *UserService) GetByUsername(username string) (*entity.User, *utils.AppError) {

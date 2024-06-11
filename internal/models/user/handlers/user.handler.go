@@ -94,18 +94,18 @@ func (u *userHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passwordCheck, passwordErr := u.userService.CheckPassword(userPayload)
+	userChecked, passwordErr := u.userService.CheckPassword(userPayload)
 	if passwordErr != nil {
 		utils.ResponseJSON(w, passwordErr.StatusCode, passwordErr.Message)
 		return
 	}
 
-	if passwordCheck == nil {
+	if userChecked == nil {
 		utils.ResponseJSON(w, http.StatusUnauthorized, "Invalid credentials")
 		return
 	}
 
-	token, tokenErr := authentication.GenerateToken(userPayload.Username)
+	token, tokenErr := authentication.GenerateToken(userChecked.ID, userChecked.Username)
 	if tokenErr != nil {
 		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
 		return

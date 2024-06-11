@@ -6,15 +6,17 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/spf13/viper"
 )
 
-func GenerateToken(username string) (string, *utils.AppError) {
+func GenerateToken(ID uuid.UUID, username string) (string, *utils.AppError) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": username,
-		"iss": "Na Hora",
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
-		"iat": time.Now().Unix(),
+		"sub":      ID,
+		"username": username,
+		"iss":      "Na Hora",
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"iat":      time.Now().Unix(),
 	})
 
 	jwtSecret := viper.Get("JWT_SECRET").(string)
