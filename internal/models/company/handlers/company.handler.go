@@ -126,5 +126,8 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// emailProvider := providers.NewEmailProvider()
+	// emailProvider.SendWelcomeEmail("alexandre.hartmann@na-hora.com", "Email de teste", "<h1>ESSE É UM TESTE<h1><br><a href='https://www.google.com'>LINK</a>")
+
 	utils.ResponseJSON(w, http.StatusCreated, response)
 }

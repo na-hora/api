@@ -15,7 +15,7 @@ func GenerateToken(ID uuid.UUID, username string) (string, *utils.AppError) {
 		"sub":      ID,
 		"username": username,
 		"iss":      "Na Hora",
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
 		"iat":      time.Now().Unix(),
 	})
 
