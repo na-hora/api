@@ -9,9 +9,10 @@ import (
 
 func TokenRoutes(r chi.Router) {
 	tokenHandler := handlers.GetTokenHandler()
+	authService := authentication.NewAuthService()
 
 	r.Route("/tokens", func(r chi.Router) {
-		r.Use(authentication.JwtAuthentication)
+		r.Use(authService.JwtAuthMiddleware)
 
 		r.Post("/generate", tokenHandler.GenerateRegisterLink)
 	})

@@ -17,7 +17,8 @@ type UserLogged struct {
 }
 
 func JwtUserOrThrow(ctx context.Context) (*UserLogged, *utils.AppError) {
-	claims := authentication.GetClaimsFromContext(ctx)
+	authService := authentication.NewAuthService()
+	claims := authService.GetClaimsFromContext(ctx)
 	ID := claims["sub"]
 
 	if ID == nil {

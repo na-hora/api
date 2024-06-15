@@ -10,13 +10,24 @@ import (
 	"github.com/spf13/viper"
 )
 
+type AuthService interface {
+	JwtAuthMiddleware(next http.Handler) http.Handler
+	GetClaimsFromContext(ctx context.Context) jwt.MapClaims
+}
+
+type authService struct{}
+
+func NewAuthService() AuthService {
+	return &authService{}
+}
+
 type contextKey string
 
 const (
 	TokenContextKey contextKey = "userClaims"
 )
 
-func JwtAuthentication(next http.Handler) http.Handler {
+func (m *authService) JwtAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
@@ -68,7 +79,7 @@ func validateToken(tokenString string) (*jwt.Token, jwt.MapClaims, error) {
 	return nil, nil, fmt.Errorf("invalid token")
 }
 
-func GetClaimsFromContext(ctx context.Context) jwt.MapClaims {
+func (m *authService) GetClaimsFromContext(ctx context.Context) jwt.MapClaims {
 	if claims, ok := ctx.Value(TokenContextKey).(jwt.MapClaims); ok {
 		return claims
 	}
