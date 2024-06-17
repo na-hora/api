@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm"
 	"na-hora/api/internal/models/company/repositories"
 	"na-hora/api/internal/models/company/services"
+	repositories4 "na-hora/api/internal/models/state/repositories"
+	services4 "na-hora/api/internal/models/state/services"
 	repositories3 "na-hora/api/internal/models/token/repositories"
 	services3 "na-hora/api/internal/models/token/services"
 	repositories2 "na-hora/api/internal/models/user/repositories"
@@ -37,6 +39,12 @@ func InitializeTokenService(db *gorm.DB) services3.TokenServiceInterface {
 	return tokenServiceInterface
 }
 
+func InitializeStateService(db *gorm.DB) services4.StateServiceInterface {
+	stateRepositoryInterface := repositories4.GetStateRepository(db)
+	stateServiceInterface := services4.GetStateService(stateRepositoryInterface)
+	return stateServiceInterface
+}
+
 // wire.go:
 
 var CompanyServiceSet = wire.NewSet(repositories.GetCompanyRepository, services.GetCompanyService)
@@ -44,3 +52,5 @@ var CompanyServiceSet = wire.NewSet(repositories.GetCompanyRepository, services.
 var UserServiceSet = wire.NewSet(repositories2.GetUserRepository, services2.GetUserService)
 
 var TokenServiceSet = wire.NewSet(repositories3.GetTokenRepository, services3.GetTokenService)
+
+var StateServiceSet = wire.NewSet(repositories4.GetStateRepository, services4.GetStateService)

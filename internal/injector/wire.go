@@ -13,6 +13,9 @@ import (
 	tokenRepositories "na-hora/api/internal/models/token/repositories"
 	tokenServices "na-hora/api/internal/models/token/services"
 
+	stateRepositories "na-hora/api/internal/models/state/repositories"
+	stateServices "na-hora/api/internal/models/state/services"
+
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -48,5 +51,17 @@ var TokenServiceSet = wire.NewSet(
 
 func InitializeTokenService(db *gorm.DB) tokenServices.TokenServiceInterface {
 	wire.Build(TokenServiceSet)
+	return nil // This line should never be executed; Wire replaces it
+}
+
+// ------------------------------------------------------------------------ //
+
+var StateServiceSet = wire.NewSet(
+	stateRepositories.GetStateRepository,
+	stateServices.GetStateService,
+)
+
+func InitializeStateService(db *gorm.DB) stateServices.StateServiceInterface {
+	wire.Build(StateServiceSet)
 	return nil // This line should never be executed; Wire replaces it
 }
