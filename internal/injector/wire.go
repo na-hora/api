@@ -16,6 +16,9 @@ import (
 	stateRepositories "na-hora/api/internal/models/state/repositories"
 	stateServices "na-hora/api/internal/models/state/services"
 
+	cityRepositories "na-hora/api/internal/models/city/repositories"
+	cityServices "na-hora/api/internal/models/city/services"
+
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -63,5 +66,17 @@ var StateServiceSet = wire.NewSet(
 
 func InitializeStateService(db *gorm.DB) stateServices.StateServiceInterface {
 	wire.Build(StateServiceSet)
+	return nil // This line should never be executed; Wire replaces it
+}
+
+// ------------------------------------------------------------------------ //
+
+var CityServiceSet = wire.NewSet(
+	cityRepositories.GetCityRepository,
+	cityServices.GetCityService,
+)
+
+func InitializeCityService(db *gorm.DB) cityServices.CityServiceInterface {
+	wire.Build(CityServiceSet)
 	return nil // This line should never be executed; Wire replaces it
 }

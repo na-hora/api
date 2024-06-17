@@ -2,7 +2,7 @@ include .env
 .PHONY: m-generate
 
 dev:
-		go run cmd/server/main.go
+		make m-apply; go run cmd/server/main.go
 
 build:
 		go build cmd/server/main.go && ./main

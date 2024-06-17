@@ -9,6 +9,8 @@ package injector
 import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
+	repositories5 "na-hora/api/internal/models/city/repositories"
+	services5 "na-hora/api/internal/models/city/services"
 	"na-hora/api/internal/models/company/repositories"
 	"na-hora/api/internal/models/company/services"
 	repositories4 "na-hora/api/internal/models/state/repositories"
@@ -45,6 +47,12 @@ func InitializeStateService(db *gorm.DB) services4.StateServiceInterface {
 	return stateServiceInterface
 }
 
+func InitializeCityService(db *gorm.DB) services5.CityServiceInterface {
+	cityRepositoryInterface := repositories5.GetCityRepository(db)
+	cityServiceInterface := services5.GetCityService(cityRepositoryInterface)
+	return cityServiceInterface
+}
+
 // wire.go:
 
 var CompanyServiceSet = wire.NewSet(repositories.GetCompanyRepository, services.GetCompanyService)
@@ -54,3 +62,5 @@ var UserServiceSet = wire.NewSet(repositories2.GetUserRepository, services2.GetU
 var TokenServiceSet = wire.NewSet(repositories3.GetTokenRepository, services3.GetTokenService)
 
 var StateServiceSet = wire.NewSet(repositories4.GetStateRepository, services4.GetStateService)
+
+var CityServiceSet = wire.NewSet(repositories5.GetCityRepository, services5.GetCityService)
