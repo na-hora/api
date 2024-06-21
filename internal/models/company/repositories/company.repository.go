@@ -12,7 +12,7 @@ import (
 
 type CompanyRepositoryInterface interface {
 	Create(dtos.CreateCompanyRequestBody, *gorm.DB) (*entity.Company, *utils.AppError)
-	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
+	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressParams, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
 }
 
 type CompanyRepository struct {
@@ -49,7 +49,7 @@ func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody, tx *go
 	return &insertValue, nil
 }
 
-func (cr *CompanyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError) {
+func (cr *CompanyRepository) CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressParams, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError) {
 	if tx == nil {
 		tx = cr.db
 	}

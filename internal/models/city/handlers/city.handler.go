@@ -13,6 +13,7 @@ import (
 
 type CityHandlerInterface interface {
 	ListAllByState(w http.ResponseWriter, r *http.Request)
+	GetByIBGE(w http.ResponseWriter, r *http.Request)
 }
 
 type CityHandler struct {
@@ -52,6 +53,33 @@ func (ch *CityHandler) ListAllByState(w http.ResponseWriter, r *http.Request) {
 			Name: city.Name,
 		})
 	}
+
+	utils.ResponseJSON(w, http.StatusCreated, response)
+}
+
+func (ch *CityHandler) GetByIBGE(w http.ResponseWriter, r *http.Request) {
+	ibge := chi.URLParam(r, "ibge")
+
+	if ibge == "" {
+		utils.ResponseJSON(w, http.StatusBadRequest, "ibge is required")
+		return
+	}
+
+	cityFound, sErr := ch.cityService.GetByIBGE(ibge)
+	if sErr != nil {
+		utils.ResponseJSON(w, sErr.StatusCode, sErr.Message)
+		return
+	}
+
+	if cityFound == nil {
+		utils.ResponseJSON(w, http.StatusNotFound, "city not found")
+		return
+	}
+
+	response := &dtos.GetCityByIBGEResponse{City: dtos.City{
+		ID:   cityFound.ID,
+		Name: cityFound.Name,
+	}}
 
 	utils.ResponseJSON(w, http.StatusCreated, response)
 }

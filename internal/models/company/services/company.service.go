@@ -12,7 +12,7 @@ import (
 
 type CompanyServiceInterface interface {
 	CreateCompany(companyCreate dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError)
-	CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
+	CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressParams, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
 }
 
 type CompanyService struct {
@@ -34,7 +34,7 @@ func (cs *CompanyService) CreateCompany(companyCreate dtos.CreateCompanyRequestB
 	return companyCreated, nil
 }
 
-func (cs *CompanyService) CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressRequestBody, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError) {
+func (cs *CompanyService) CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressParams, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError) {
 	companyAddressCreated, err := cs.companyRepository.CreateAddress(companyID, addressCreate, tx)
 	if err != nil {
 		return nil, err

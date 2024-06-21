@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type CreateCompanyAddressRequestBody struct {
 	ZipCode      string `json:"zipCode" validate:"required"`
-	CityID       uint   `json:"cityId" validate:"required"`
+	CityIBGE     string `json:"cityIbge" validate:"required"`
 	Neighborhood string `json:"neighborhood" validate:"required"`
 	Street       string `json:"street" validate:"required"`
 	Number       uint   `json:"number"`

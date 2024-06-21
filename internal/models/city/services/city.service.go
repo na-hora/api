@@ -8,6 +8,7 @@ import (
 
 type CityServiceInterface interface {
 	ListAllByState(stateID uint) ([]entity.City, *utils.AppError)
+	GetByIBGE(ibge string) (*entity.City, *utils.AppError)
 }
 
 type CityService struct {
@@ -26,4 +27,12 @@ func (cs *CityService) ListAllByState(stateID uint) ([]entity.City, *utils.AppEr
 		return nil, err
 	}
 	return allCities, nil
+}
+
+func (cs *CityService) GetByIBGE(ibge string) (*entity.City, *utils.AppError) {
+	cityFound, err := cs.cityRepository.GetByIBGE(ibge)
+	if err != nil {
+		return nil, err
+	}
+	return cityFound, nil
 }

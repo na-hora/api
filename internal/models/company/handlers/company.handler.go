@@ -8,6 +8,7 @@ import (
 	companyDTOs "na-hora/api/internal/models/company/dtos"
 	userDTOs "na-hora/api/internal/models/user/dtos"
 
+	cityServices "na-hora/api/internal/models/city/services"
 	companyServices "na-hora/api/internal/models/company/services"
 	tokenServices "na-hora/api/internal/models/token/services"
 	userServices "na-hora/api/internal/models/user/services"
@@ -26,17 +27,20 @@ type CompanyHandler struct {
 	companyService companyServices.CompanyServiceInterface
 	userService    userServices.UserServiceInterface
 	tokenService   tokenServices.TokenServiceInterface
+	cityService    cityServices.CityServiceInterface
 }
 
 func GetCompanyHandler() CompanyHandlerInterface {
 	companyService := injector.InitializeCompanyService(config.DB)
 	userService := injector.InitializeUserService(config.DB)
 	tokenService := injector.InitializeTokenService(config.DB)
+	cityService := injector.InitializeCityService(config.DB)
 
 	return &CompanyHandler{
 		companyService,
 		userService,
 		tokenService,
+		cityService,
 	}
 }
 
@@ -77,7 +81,30 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if companyPayload.Address != nil {
-		_, addressErr := c.companyService.CreateAddress(company.ID, *companyPayload.Address, tx)
+		cityFound, cityErr := c.cityService.GetByIBGE(companyPayload.Address.CityIBGE)
+
+		if cityErr != nil {
+			tx.Rollback()
+			utils.ResponseJSON(w, cityErr.StatusCode, cityErr.Message)
+			return
+		}
+
+		if cityFound == nil {
+			tx.Rollback()
+			utils.ResponseJSON(w, http.StatusNotFound, "city not found")
+			return
+		}
+
+		servicePayload := &companyDTOs.CreateCompanyAddressParams{
+			ZipCode:      companyPayload.Address.ZipCode,
+			CityID:       cityFound.ID,
+			Neighborhood: companyPayload.Address.Neighborhood,
+			Street:       companyPayload.Address.Street,
+			Number:       companyPayload.Address.Number,
+			Complement:   companyPayload.Address.Complement,
+		}
+
+		_, addressErr := c.companyService.CreateAddress(company.ID, *servicePayload, tx)
 
 		if addressErr != nil {
 			tx.Rollback()
