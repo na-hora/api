@@ -52,7 +52,7 @@ func (th *TokenHandler) GenerateRegisterLink(w http.ResponseWriter, r *http.Requ
 	}
 
 	response := &tokenDTOs.GenerateTokenResponse{
-		URL: fmt.Sprintf("%s/companies/register?token=%s", viper.Get("WEB_URL"), token.Key),
+		URL: fmt.Sprintf("%s/company/register?validator=%s", viper.Get("WEB_URL"), token.Key),
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, response)
