@@ -54,9 +54,14 @@ func checkRequiredEnvs() {
 		"MAIL_SENDER_TOKEN",
 		"EMAIL_WELCOME_TEMPLATE_ID",
 		"EMAIL_FORGOT_PASSWORD_TEMPLATE_ID",
+		"ENVIRONMENT",
 	}
 
 	for _, env := range requiredEnvs {
+		if env == "ENVIRONMENT" && viper.Get(env) == nil {
+			viper.Set("ENVIRONMENT", "local")
+		}
+
 		if viper.Get(env) == nil {
 			panic(env + " env not set")
 		}

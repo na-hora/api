@@ -13,7 +13,8 @@ import (
 type TokenServiceInterface interface {
 	Generate(data tokenDTOs.GenerateTokenRequestBody) (*entity.Token, *utils.AppError)
 	GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppError)
-	UseToken(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError
+	UseCompanyToken(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError
+	UseUserToken(key uuid.UUID, userID uuid.UUID, tx *gorm.DB) *utils.AppError
 }
 
 type TokenService struct {
@@ -35,15 +36,25 @@ func (ts *TokenService) Generate(data tokenDTOs.GenerateTokenRequestBody) (*enti
 }
 
 func (ts *TokenService) GetValidToken(key uuid.UUID) (*entity.Token, *utils.AppError) {
-	tokenExistent, err := ts.tokenRepository.GetByKey(key)
+	tokenExistent, err := ts.tokenRepository.GetValidByKey(key)
 	if err != nil {
 		return nil, err
 	}
 	return tokenExistent, nil
 }
 
-func (ts *TokenService) UseToken(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError {
-	err := ts.tokenRepository.MarkAsUsed(key, companyID, tx)
+func (ts *TokenService) UseCompanyToken(key uuid.UUID, companyID uuid.UUID, tx *gorm.DB) *utils.AppError {
+	err := ts.tokenRepository.MarkAsUsedByCompany(key, companyID, tx)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ts *TokenService) UseUserToken(key uuid.UUID, userID uuid.UUID, tx *gorm.DB) *utils.AppError {
+	err := ts.tokenRepository.MarkAsUsedByUser(key, userID, tx)
 
 	if err != nil {
 		return err

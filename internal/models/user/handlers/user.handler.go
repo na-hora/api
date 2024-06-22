@@ -225,9 +225,28 @@ func (u *userHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatePassErr := u.userService.UpdatePassword(user.ID, userPayload.Password, nil)
+	tx := config.StartTransaction()
+	updatePassErr := u.userService.UpdatePassword(user.ID, userPayload.Password, tx)
 	if updatePassErr != nil {
+		tx.Rollback()
 		utils.ResponseJSON(w, updatePassErr.StatusCode, updatePassErr.Message)
+		return
+	}
+
+	tokenErr = u.tokenService.UseUserToken(
+		validatorFound.Key,
+		user.ID,
+		tx,
+	)
+	if tokenErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
+		return
+	}
+
+	dbInfo := tx.Commit()
+	if dbInfo.Error != nil {
+		utils.ResponseJSON(w, http.StatusInternalServerError, dbInfo.Error.Error())
 		return
 	}
 

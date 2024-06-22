@@ -35,6 +35,11 @@ func NewEmailProvider() EmailProviderInterface {
 }
 
 func (e *emailProvider) SendWelcomeEmail(to string) {
+	if viper.Get("ENVIRONMENT") == "local" {
+		fmt.Printf("Tried to send local welcome email to %s", to)
+		return
+	}
+
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
@@ -78,6 +83,11 @@ func (e *emailProvider) SendWelcomeEmail(to string) {
 }
 
 func (e *emailProvider) SendForgotPasswordEmail(to string, validator uuid.UUID) {
+	if viper.Get("ENVIRONMENT") == "local" {
+		fmt.Printf("\nTried to send local forgot password email to %s\n\n", to)
+		return
+	}
+
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()

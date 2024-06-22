@@ -119,7 +119,7 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	tokenErr = c.tokenService.UseToken(validatorFound.Key, company.ID, tx)
+	tokenErr = c.tokenService.UseCompanyToken(validatorFound.Key, company.ID, tx)
 
 	response := &companyDTOs.CreateCompanyResponse{
 		ID: company.ID,
