@@ -19,7 +19,6 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/spf13/viper"
 )
 
 type UserHandlerInterface interface {
@@ -178,12 +177,7 @@ func (u *userHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	emailProvider := providers.NewEmailProvider()
 	emailProvider.SendForgotPasswordEmail(
 		userPayload.Email,
-		"Recuperação de senha",
-		fmt.Sprintf(
-			"Clique <a href=\"%s/reset-password?validator=%s\">aqui</a> para trocar a sua senha",
-			viper.Get("WEB_URL"),
-			resetPassToken.Key,
-		),
+		resetPassToken.Key,
 	)
 }
 

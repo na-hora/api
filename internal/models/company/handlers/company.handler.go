@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
 	"na-hora/api/internal/providers"
@@ -19,7 +18,6 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/spf13/viper"
 )
 
 type CompanyHandlerInterface interface {
@@ -156,7 +154,7 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 
 		emailProvider := providers.NewEmailProvider()
-		emailProvider.SendWelcomeEmail(companyPayload.Email, "Bem vindo ao na hora!", fmt.Sprintf("Clique <a href='%s/dashboard'>aqui</a> para acessar a plataforma", viper.Get("WEB_URL")))
+		emailProvider.SendWelcomeEmail(companyPayload.Email)
 	}
 
 	dbInfo := tx.Commit()

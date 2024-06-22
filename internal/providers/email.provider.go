@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/mailersend/mailersend-go"
 	"github.com/spf13/viper"
 )
 
 type EmailProviderInterface interface {
-	SendWelcomeEmail(to string, subject string, html string)
-	SendForgotPasswordEmail(to string, subject string, html string)
+	SendWelcomeEmail(to string)
+	SendForgotPasswordEmail(to string, validator uuid.UUID)
 }
 
 type emailProvider struct {
@@ -33,7 +34,7 @@ func NewEmailProvider() EmailProviderInterface {
 	}
 }
 
-func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string) {
+func (e *emailProvider) SendWelcomeEmail(to string) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
@@ -55,8 +56,17 @@ func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string)
 
 	message.SetFrom(from)
 	message.SetRecipients(recipients)
-	message.SetSubject(subject)
-	message.SetHTML(html)
+	message.SetSubject("Bem vindo ao na hora!")
+	message.SetTemplateID(viper.Get("EMAIL_WELCOME_TEMPLATE_ID").(string))
+	message.SetPersonalization([]mailersend.Personalization{
+		{
+			Email: to,
+			Data: map[string]interface{}{
+				"dashboard_url": fmt.Sprintf("%s/dashboard", viper.Get("WEB_URL")),
+				"support_email": "contato@na-hora.com",
+			},
+		},
+	})
 	message.SetTags(tags)
 
 	res, emailErr := e.sender.Email.Send(ctx, message)
@@ -67,7 +77,7 @@ func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string)
 	fmt.Println(res)
 }
 
-func (e *emailProvider) SendForgotPasswordEmail(to string, subject string, html string) {
+func (e *emailProvider) SendForgotPasswordEmail(to string, validator uuid.UUID) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
@@ -89,8 +99,17 @@ func (e *emailProvider) SendForgotPasswordEmail(to string, subject string, html 
 
 	message.SetFrom(from)
 	message.SetRecipients(recipients)
-	message.SetSubject(subject)
-	message.SetHTML(html)
+	message.SetSubject("Recuperação de senha")
+	message.SetTemplateID(viper.Get("EMAIL_FORGOT_PASSWORD_TEMPLATE_ID").(string))
+	message.SetPersonalization([]mailersend.Personalization{
+		{
+			Email: to,
+			Data: map[string]interface{}{
+				"reset_link":    fmt.Sprintf("%s/reset-password?validator=%s", viper.Get("WEB_URL"), validator),
+				"support_email": "contato@na-hora.com",
+			},
+		},
+	})
 	message.SetTags(tags)
 
 	res, emailErr := e.sender.Email.Send(ctx, message)

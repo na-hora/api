@@ -52,6 +52,8 @@ func checkRequiredEnvs() {
 		"WEB_URL",
 		"JWT_SECRET",
 		"MAIL_SENDER_TOKEN",
+		"EMAIL_WELCOME_TEMPLATE_ID",
+		"EMAIL_FORGOT_PASSWORD_TEMPLATE_ID",
 	}
 
 	for _, env := range requiredEnvs {
