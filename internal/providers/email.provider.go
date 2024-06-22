@@ -9,17 +9,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-type EmailProvider interface {
+type EmailProviderInterface interface {
 	SendWelcomeEmail(to string, subject string, html string)
+	SendForgotPasswordEmail(to string, subject string, html string)
 }
 
-type emailProvider struct{}
-
-func NewEmailProvider() EmailProvider {
-	return &emailProvider{}
+type emailProvider struct {
+	sender *mailersend.Mailersend
 }
 
-func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string) {
+func NewEmailProvider() EmailProviderInterface {
 	var APIKey = viper.Get("MAIL_SENDER_TOKEN")
 
 	if APIKey == nil {
@@ -27,9 +26,14 @@ func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string)
 	}
 
 	APITokenStringified := fmt.Sprintf("%v", APIKey)
+	sender := mailersend.NewMailersend(APITokenStringified)
 
-	ms := mailersend.NewMailersend(APITokenStringified)
+	return &emailProvider{
+		sender,
+	}
+}
 
+func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string) {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
@@ -47,7 +51,7 @@ func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string)
 
 	tags := []string{"welcome"}
 
-	message := ms.Email.NewMessage()
+	message := e.sender.Email.NewMessage()
 
 	message.SetFrom(from)
 	message.SetRecipients(recipients)
@@ -55,7 +59,41 @@ func (e *emailProvider) SendWelcomeEmail(to string, subject string, html string)
 	message.SetHTML(html)
 	message.SetTags(tags)
 
-	res, emailErr := ms.Email.Send(ctx, message)
+	res, emailErr := e.sender.Email.Send(ctx, message)
+	if emailErr != nil {
+		fmt.Println(emailErr.Error())
+	}
+
+	fmt.Println(res)
+}
+
+func (e *emailProvider) SendForgotPasswordEmail(to string, subject string, html string) {
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	from := mailersend.From{
+		Name:  "Na hora",
+		Email: "admin@na-hora.com",
+	}
+
+	recipients := []mailersend.Recipient{
+		{
+			Email: to,
+		},
+	}
+
+	tags := []string{"forgot-password"}
+
+	message := e.sender.Email.NewMessage()
+
+	message.SetFrom(from)
+	message.SetRecipients(recipients)
+	message.SetSubject(subject)
+	message.SetHTML(html)
+	message.SetTags(tags)
+
+	res, emailErr := e.sender.Email.Send(ctx, message)
 	if emailErr != nil {
 		fmt.Println(emailErr.Error())
 	}

@@ -14,6 +14,7 @@ type UserRepositoryInterface interface {
 	Create(insert dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError)
 	GetByID(ID uuid.UUID) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
+	UpdatePassword(ID uuid.UUID, hash string, tx *gorm.DB) *utils.AppError
 }
 
 type UserRepository struct {
@@ -76,4 +77,19 @@ func (ur *UserRepository) GetByUsername(username string) (*entity.User, *utils.A
 		return nil, nil
 	}
 	return &user, nil
+}
+
+func (ur *UserRepository) UpdatePassword(ID uuid.UUID, hash string, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = ur.db
+	}
+
+	data := tx.Model(&entity.User{}).Where("ID = ?", ID).Update("password", hash)
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return nil
 }

@@ -12,3 +12,13 @@ type LoginUserRequestBody struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
+
+type ForgotUserPasswordRequestBody struct {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type ResetUserPasswordRequestBody struct {
+	Email     string    `json:"email" validate:"required,email"`
+	Password  string    `json:"password" validate:"required"`
+	Validator uuid.UUID `json:"validator" validate:"required"`
+}

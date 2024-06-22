@@ -69,6 +69,11 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if validatorFound == nil {
+		utils.ResponseJSON(w, http.StatusUnauthorized, "validator not found")
+		return
+	}
+
 	appErr := utils.ValidateCNPJ(companyPayload.CNPJ)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)

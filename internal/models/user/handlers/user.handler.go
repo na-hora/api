@@ -2,29 +2,47 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
+	"strings"
+
 	userDTOs "na-hora/api/internal/models/user/dtos"
-	"na-hora/api/internal/models/user/services"
+	userServices "na-hora/api/internal/models/user/services"
+
+	tokenDTOs "na-hora/api/internal/models/token/dtos"
+	tokenServices "na-hora/api/internal/models/token/services"
+
+	"na-hora/api/internal/providers"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/spf13/viper"
 )
 
-type UserHandler interface {
+type UserHandlerInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request)
+	ForgotPassword(w http.ResponseWriter, r *http.Request)
+	ResetPassword(w http.ResponseWriter, r *http.Request)
+	// UpdatePassword(w http.ResponseWriter, r *http.Request)
 }
 
 type userHandler struct {
-	userService services.UserServiceInterface
+	userService  userServices.UserServiceInterface
+	tokenService tokenServices.TokenServiceInterface
 }
 
-func GetUserHandler() *userHandler {
+func GetUserHandler() UserHandlerInterface {
 	userService := injector.InitializeUserService(config.DB)
+	tokenService := injector.InitializeTokenService(config.DB)
 
-	return &userHandler{userService}
+	return &userHandler{
+		userService,
+		tokenService,
+	}
 }
 
 func (u *userHandler) Register(w http.ResponseWriter, r *http.Request) {
@@ -117,4 +135,107 @@ func (u *userHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, response)
+}
+
+func (u *userHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var userPayload userDTOs.ForgotUserPasswordRequestBody
+
+	err := json.NewDecoder(r.Body).Decode(&userPayload)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err = validate.Struct(userPayload)
+	if err != nil {
+		utils.ResponseValidationErrors(err, w)
+		return
+	}
+
+	user, serviceErr := u.userService.GetByUsername(userPayload.Email)
+	if serviceErr != nil {
+		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
+		return
+	}
+
+	if user == nil {
+		utils.ResponseJSON(w, http.StatusNotFound, "user not found")
+		return
+	}
+
+	resetPassToken, tokenErr := u.tokenService.Generate(
+		tokenDTOs.GenerateTokenRequestBody{
+			Note: fmt.Sprintf("forgot-password:%s", user.ID),
+		},
+	)
+
+	if tokenErr != nil {
+		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
+		return
+	}
+
+	emailProvider := providers.NewEmailProvider()
+	emailProvider.SendForgotPasswordEmail(
+		userPayload.Email,
+		"Recuperação de senha",
+		fmt.Sprintf(
+			"Clique <a href=\"%s/reset-password?validator=%s\">aqui</a> para trocar a sua senha",
+			viper.Get("WEB_URL"),
+			resetPassToken.Key,
+		),
+	)
+}
+
+func (u *userHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var userPayload userDTOs.ResetUserPasswordRequestBody
+
+	err := json.NewDecoder(r.Body).Decode(&userPayload)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err = validate.Struct(userPayload)
+	if err != nil {
+		utils.ResponseValidationErrors(err, w)
+		return
+	}
+
+	validatorFound, tokenErr := u.tokenService.GetValidToken(userPayload.Validator)
+	if tokenErr != nil {
+		utils.ResponseJSON(w, tokenErr.StatusCode, tokenErr.Message)
+		return
+	}
+
+	if validatorFound == nil {
+		utils.ResponseJSON(w, http.StatusUnauthorized, "validator not found")
+		return
+	}
+
+	user, serviceErr := u.userService.GetByUsername(userPayload.Email)
+
+	if serviceErr != nil {
+		utils.ResponseJSON(w, serviceErr.StatusCode, serviceErr.Message)
+		return
+	}
+
+	if user == nil {
+		utils.ResponseJSON(w, http.StatusNotFound, "user not found")
+		return
+	}
+
+	if strings.Split(validatorFound.Note, ":")[1] != user.ID.String() {
+		utils.ResponseJSON(w, http.StatusUnauthorized, "invalid validator for this user")
+		return
+	}
+
+	updatePassErr := u.userService.UpdatePassword(user.ID, userPayload.Password, nil)
+	if updatePassErr != nil {
+		utils.ResponseJSON(w, updatePassErr.StatusCode, updatePassErr.Message)
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, "password updated successfully")
 }

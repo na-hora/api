@@ -16,6 +16,7 @@ type UserServiceInterface interface {
 	GetByID(ID uuid.UUID) (*entity.User, *utils.AppError)
 	GetByUsername(username string) (*entity.User, *utils.AppError)
 	CheckPassword(userLogin dtos.LoginUserRequestBody) (*entity.User, *utils.AppError)
+	UpdatePassword(ID uuid.UUID, password string, tx *gorm.DB) *utils.AppError
 }
 
 type UserService struct {
@@ -88,4 +89,20 @@ func (us *UserService) CheckPassword(userLogin dtos.LoginUserRequestBody) (*enti
 	}
 
 	return user, nil
+}
+
+func (us *UserService) UpdatePassword(ID uuid.UUID, password string, tx *gorm.DB) *utils.AppError {
+	hash, passwordError := utils.HashPassword(password)
+	if passwordError != nil {
+		return &utils.AppError{
+			Message:    passwordError.Message,
+			StatusCode: passwordError.StatusCode,
+		}
+	}
+
+	repoErr := us.userRepository.UpdatePassword(ID, hash, tx)
+	if repoErr != nil {
+		return repoErr
+	}
+	return nil
 }
