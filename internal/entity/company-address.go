@@ -14,7 +14,7 @@ type CompanyAddress struct {
 	CityID       uint      `json:"cityId"`
 	Neighborhood string    `json:"neighborhood"`
 	Street       string    `json:"street"`
-	Number       uint      `json:"number"`
+	Number       string    `json:"number"`
 	Complement   string    `json:"complement"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`

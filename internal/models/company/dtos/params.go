@@ -5,6 +5,6 @@ type CreateCompanyAddressParams struct {
 	CityID       uint   `json:"cityId" `
 	Neighborhood string `json:"neighborhood"`
 	Street       string `json:"street"`
-	Number       uint   `json:"number"`
+	Number       string `json:"number"`
 	Complement   string `json:"complement"`
 }

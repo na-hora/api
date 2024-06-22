@@ -7,7 +7,7 @@ type CreateCompanyAddressRequestBody struct {
 	CityIBGE     string `json:"cityIbge" validate:"required"`
 	Neighborhood string `json:"neighborhood" validate:"required"`
 	Street       string `json:"street" validate:"required"`
-	Number       uint   `json:"number"`
+	Number       string `json:"number"`
 	Complement   string `json:"complement"`
 }
 
