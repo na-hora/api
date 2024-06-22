@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
+	"na-hora/api/internal/providers"
 
 	companyDTOs "na-hora/api/internal/models/company/dtos"
 	userDTOs "na-hora/api/internal/models/user/dtos"
@@ -17,6 +19,7 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/spf13/viper"
 )
 
 type CompanyHandlerInterface interface {
@@ -140,11 +143,15 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 			Password:  companyPayload.Password,
 			CompanyID: company.ID,
 		}, tx)
+
 		if userErr != nil {
 			tx.Rollback()
 			utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
 			return
 		}
+
+		emailProvider := providers.NewEmailProvider()
+		emailProvider.SendWelcomeEmail(companyPayload.Email, "Bem vindo ao na hora!", fmt.Sprintf("Clique <a href='%s/dashboard'>aqui</a> para acessar a plataforma", viper.Get("WEB_URL")))
 	}
 
 	dbInfo := tx.Commit()
@@ -152,9 +159,6 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		utils.ResponseJSON(w, http.StatusInternalServerError, dbInfo.Error.Error())
 		return
 	}
-
-	// emailProvider := providers.NewEmailProvider()
-	// emailProvider.SendWelcomeEmail("alexandre.hartmann@na-hora.com", "Email de teste", "<h1>ESSE É UM TESTE<h1><br><a href='https://www.google.com'>LINK</a>")
 
 	utils.ResponseJSON(w, http.StatusCreated, response)
 }
