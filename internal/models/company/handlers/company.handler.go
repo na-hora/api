@@ -139,23 +139,25 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userAlreadyExists != nil {
-		response.Inconsistency = "The company and address were created successfully, but the username was already taken"
-	} else {
-		_, userErr := c.userService.Create(userDTOs.CreateUserRequestBody{
-			Username:  companyPayload.Email,
-			Password:  companyPayload.Password,
-			CompanyID: company.ID,
-		}, tx)
-
-		if userErr != nil {
-			tx.Rollback()
-			utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
-			return
-		}
-
-		emailProvider := providers.NewEmailProvider()
-		emailProvider.SendWelcomeEmail(companyPayload.Email)
+		tx.Rollback()
+		utils.ResponseJSON(w, http.StatusConflict, "user already exists")
+		return
 	}
+
+	_, userErr := c.userService.Create(userDTOs.CreateUserRequestBody{
+		Username:  companyPayload.Email,
+		Password:  companyPayload.Password,
+		CompanyID: company.ID,
+	}, tx)
+
+	if userErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	emailProvider := providers.NewEmailProvider()
+	emailProvider.SendWelcomeEmail(companyPayload.Email)
 
 	dbInfo := tx.Commit()
 	if dbInfo.Error != nil {

@@ -67,7 +67,7 @@ func (e *emailProvider) SendWelcomeEmail(to string) {
 		{
 			Email: to,
 			Data: map[string]interface{}{
-				"dashboard_url": fmt.Sprintf("%s/dashboard", viper.Get("WEB_URL")),
+				"dashboard_url": fmt.Sprintf("%s/admin/login", viper.Get("WEB_URL")),
 				"support_email": "contato@na-hora.com",
 			},
 		},

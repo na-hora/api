@@ -107,7 +107,7 @@ func (u *userHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if user == nil {
-		utils.ResponseJSON(w, http.StatusNotFound, "User not found")
+		utils.ResponseJSON(w, http.StatusUnauthorized, "user not found")
 		return
 	}
 
@@ -118,7 +118,7 @@ func (u *userHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if userChecked == nil {
-		utils.ResponseJSON(w, http.StatusUnauthorized, "Invalid credentials")
+		utils.ResponseJSON(w, http.StatusUnauthorized, "invalid credentials")
 		return
 	}
 
