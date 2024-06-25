@@ -6,6 +6,7 @@ import (
 	"na-hora/api/internal/models/city/dtos"
 	"na-hora/api/internal/models/city/services"
 	"na-hora/api/internal/utils"
+	"na-hora/api/internal/utils/conversor"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -35,7 +36,8 @@ func (ch *CityHandler) ListAllByState(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stateIDUint, _ := utils.StringToUint(stateID)
+	strConv := conversor.GetStringConversor()
+	stateIDUint, _ := strConv.ToUint64(stateID)
 
 	allCities, sErr := ch.cityService.ListAllByState(uint(stateIDUint))
 	if sErr != nil {

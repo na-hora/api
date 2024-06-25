@@ -30,11 +30,12 @@ func GetUserService(repo repositories.UserRepositoryInterface) UserServiceInterf
 }
 
 func (us *UserService) Create(userCreate dtos.CreateUserRequestBody, tx *gorm.DB) (*entity.User, *utils.AppError) {
-	hash, passwordError := utils.HashPassword(userCreate.Password)
-	if passwordError != nil {
+	passUtil := utils.GetPasswordUtil()
+	hash, hashErr := passUtil.HashPassword(userCreate.Password)
+	if hashErr != nil {
 		return nil, &utils.AppError{
-			Message:    passwordError.Message,
-			StatusCode: passwordError.StatusCode,
+			Message:    hashErr.Error(),
+			StatusCode: http.StatusInternalServerError,
 		}
 	}
 
@@ -81,7 +82,8 @@ func (us *UserService) CheckPassword(userLogin dtos.LoginUserRequestBody) (*enti
 		}
 	}
 
-	if !utils.CheckPasswordHash(userLogin.Password, user.Password) {
+	passUtil := utils.GetPasswordUtil()
+	if !passUtil.CheckPasswordHash(userLogin.Password, user.Password) {
 		return nil, &utils.AppError{
 			Message:    "wrong password",
 			StatusCode: http.StatusUnauthorized,
@@ -92,11 +94,12 @@ func (us *UserService) CheckPassword(userLogin dtos.LoginUserRequestBody) (*enti
 }
 
 func (us *UserService) UpdatePassword(ID uuid.UUID, password string, tx *gorm.DB) *utils.AppError {
-	hash, passwordError := utils.HashPassword(password)
-	if passwordError != nil {
+	passUtil := utils.GetPasswordUtil()
+	hash, hashErr := passUtil.HashPassword(password)
+	if hashErr != nil {
 		return &utils.AppError{
-			Message:    passwordError.Message,
-			StatusCode: passwordError.StatusCode,
+			Message:    hashErr.Error(),
+			StatusCode: http.StatusInternalServerError,
 		}
 	}
 

@@ -1,23 +1,31 @@
 package utils
 
 import (
-	"net/http"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashPassword(password string) (string, *AppError) {
+type PasswordUtilInterface interface {
+	HashPassword(password string) (string, error)
+	CheckPasswordHash(password, hash string) bool
+}
+
+type passwordUtil struct{}
+
+func GetPasswordUtil() PasswordUtilInterface {
+	return &passwordUtil{}
+}
+
+func (pu *passwordUtil) HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
-		return "", &AppError{
-			Message:    "error hashing password",
-			StatusCode: http.StatusInternalServerError,
-		}
+		return "", fmt.Errorf("error hashing password")
 	}
 	return string(bytes), nil
 }
 
-func CheckPasswordHash(password, hash string) bool {
+func (pu *passwordUtil) CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
