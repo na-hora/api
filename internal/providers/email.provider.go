@@ -115,7 +115,7 @@ func (e *emailProvider) SendForgotPasswordEmail(to string, validator uuid.UUID) 
 		{
 			Email: to,
 			Data: map[string]interface{}{
-				"reset_link":    fmt.Sprintf("%s/reset-password?validator=%s", viper.Get("WEB_URL"), validator),
+				"reset_link":    fmt.Sprintf("%s/admin/reset-password?email=%s&validator=%s", viper.Get("WEB_URL"), to, validator),
 				"support_email": "contato@na-hora.com",
 			},
 		},
