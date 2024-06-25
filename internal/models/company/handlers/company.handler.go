@@ -5,6 +5,7 @@ import (
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
 	"na-hora/api/internal/providers"
+	"na-hora/api/internal/utils/validators"
 
 	companyDTOs "na-hora/api/internal/models/company/dtos"
 	userDTOs "na-hora/api/internal/models/user/dtos"
@@ -72,9 +73,11 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	appErr := utils.ValidateCNPJ(companyPayload.CNPJ)
-	if appErr != nil {
-		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+	documentValidator := validators.GetDocumentValidator()
+	valid := documentValidator.ValidateCNPJ(companyPayload.CNPJ)
+
+	if !valid {
+		utils.ResponseJSON(w, http.StatusBadRequest, "invalid CNPJ")
 		return
 	}
 
