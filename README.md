@@ -26,9 +26,7 @@
 #### # *3* Run ```cp .env.model .env```
 #### # *4* Run ```docker-compose up -d```
 #### # *5* Run ```make m-apply```
-#### # *6* Run ```make dev```
-
-#### Tips: Remember to have Atlas installed on your machine. If necessary, use: ```curl -sSf https://atlasgo.sh | sh```
+#### # *5* Run ```make dev```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <hr>
@@ -42,7 +40,7 @@
 #### ```make wire```
 
 #### You can modify the DB structure using migrations changing the go entities and running:
-#### ```make m-generate name=name-for-the-migration```
+#### ```make m-generate --name=name-for-the-migration```
 #### And to apply it to the database use:
 #### ```make m-apply```
 
