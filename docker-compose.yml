@@ -2,9 +2,9 @@ version: "3.9"
 name: na-hora
 
 services: 
-    pg_db:
+    na_hora_pg:
         image: postgres:latest
-        container_name: pg_db
+        container_name: na_hora_pg
         restart: always
         ports: 
             - 5432:5432
