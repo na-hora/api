@@ -26,7 +26,9 @@
 #### # *3* Run ```cp .env.model .env```
 #### # *4* Run ```docker-compose up -d```
 #### # *5* Run ```make m-apply```
-#### # *5* Run ```make dev```
+#### # *6* Run ```make dev```
+
+#### Tips: Remember to have Atlas installed on your machine. If necessary, use: ```curl -sSf https://atlasgo.sh | sh```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <hr>
