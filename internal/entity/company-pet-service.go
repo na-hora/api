@@ -12,7 +12,7 @@ type CompanyPetService struct {
 
 	CompanyID   uuid.UUID `json:"companyId" gorm:"not null"`
 	Name        string    `json:"name" gorm:"not null"`
-	Concurrency int       `json:"concurrency" gorm:"not null;default:1"`
+	Paralellism int       `json:"paralellism" gorm:"not null;default:1"`
 
 	CreatedAt time.Time      `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
