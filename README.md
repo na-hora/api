@@ -42,7 +42,7 @@
 #### ```make wire```
 
 #### You can modify the DB structure using migrations changing the go entities and running:
-#### ```make m-generate --name=name-for-the-migration```
+#### ```make m-generate name=name-for-the-migration```
 #### And to apply it to the database use:
 #### ```make m-apply```
 
