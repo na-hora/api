@@ -46,4 +46,6 @@
 #### And to apply it to the database use:
 #### ```make m-apply```
 
+#### Tips: Remember to have Wire installed on your machine. If necessary, use: ```go install github.com/google/wire/cmd/wire@latest```
+
 <p align="right">(<a href="#top">back to top</a>)</p>

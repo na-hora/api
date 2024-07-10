@@ -12,8 +12,9 @@ import (
 )
 
 type UserLogged struct {
-	ID       uuid.UUID
-	Username string
+	ID        uuid.UUID
+	Username  string
+	CompanyID uuid.UUID
 }
 
 func JwtUserOrThrow(ctx context.Context) (*UserLogged, *utils.AppError) {
@@ -45,7 +46,8 @@ func JwtUserOrThrow(ctx context.Context) (*UserLogged, *utils.AppError) {
 	}
 
 	return &UserLogged{
-		ID:       userFound.ID,
-		Username: userFound.Username,
+		ID:        userFound.ID,
+		Username:  userFound.Username,
+		CompanyID: userFound.CompanyID,
 	}, nil
 }

@@ -12,8 +12,8 @@ type CompanyHour struct {
 
 	CompanyID uuid.UUID `json:"companyId" gorm:"not null"`
 	Weekday   int       `json:"weekday" gorm:"not null"`
-	StartHour float64   `json:"startHour" gorm:"not null"`
-	EndHour   float64   `json:"endHour" gorm:"not null"`
+	StartHour int       `json:"startHour" gorm:"not null"`
+	EndHour   int       `json:"endHour" gorm:"not null"`
 
 	CreatedAt time.Time      `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
