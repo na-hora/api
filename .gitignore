@@ -26,4 +26,4 @@ migrations/atlas.sum
 __debug*
 
 /main
-/tmp/*
+/tmp

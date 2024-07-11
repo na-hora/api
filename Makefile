@@ -1,11 +1,14 @@
 include .env
 .PHONY: m-generate
 
+r-dev:
+		make m-apply; air
+
 dev:
-		make m-apply; go run cmd/server/main.go
+		make m-apply; go build -o ./tmp/main cmd/server/main.go; ./tmp/main
 
 build:
-		go build cmd/server/main.go
+		go build -o ./tmp/main cmd/server/main.go
 
 m-generate:
 		atlas migrate hash; atlas migrate diff --env gorm $(name)

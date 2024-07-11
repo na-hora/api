@@ -26,10 +26,11 @@
 #### # *3* Run ```cp .env.model .env```
 #### # *4* Run ```docker-compose up -d```
 #### # *5* Run ```make m-apply```
-#### # *6* Run ```make dev```
+#### # *6* Run ```make dev``` <- This will run the program without live reload
+#### # *7* Or run ```make r-dev``` <- This will run the program with air and build (live reload)
 
 #### Tips: Remember to have Atlas installed on your machine. If necessary, use: ```curl -sSf https://atlasgo.sh | sh```
-#### If you want to run it with live reload, remember to install AIR: ```go install github.com/cosmtrek/air@latest```
+#### If you want to run it with live reload, remember to install AIR: ```curl -sSfL https://raw.githubusercontent.com/air-verse/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <hr>
