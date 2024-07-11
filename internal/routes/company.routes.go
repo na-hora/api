@@ -1,6 +1,7 @@
 package routes
 
 import (
+	companyHourBlockHandlers "na-hora/api/internal/models/company-hour-block/handlers"
 	companyHourHandlers "na-hora/api/internal/models/company-hour/handlers"
 	companyHandlers "na-hora/api/internal/models/company/handlers"
 	authentication "na-hora/api/internal/routes/middlewares"
@@ -11,6 +12,7 @@ import (
 func CompanyRoutes(r chi.Router) {
 	companyHandler := companyHandlers.GetCompanyHandler()
 	companyHourHandler := companyHourHandlers.GetCompanyHourHandler()
+	companyHourBlockHandler := companyHourBlockHandlers.GetCompanyHourBlockHandler()
 
 	authService := authentication.NewAuthService()
 
@@ -24,6 +26,7 @@ func CompanyRoutes(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.Post("/hour", companyHourHandler.CreateMany)
+			r.Post("/hour/block", companyHourBlockHandler.CreateMany)
 		})
 	})
 }

@@ -24,3 +24,6 @@ go.work
 
 migrations/atlas.sum
 __debug*
+
+/main
+/tmp/*

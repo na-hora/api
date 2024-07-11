@@ -29,6 +29,7 @@
 #### # *6* Run ```make dev```
 
 #### Tips: Remember to have Atlas installed on your machine. If necessary, use: ```curl -sSf https://atlasgo.sh | sh```
+#### If you want to run it with live reload, remember to install AIR: ```go install github.com/cosmtrek/air@latest```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 <hr>

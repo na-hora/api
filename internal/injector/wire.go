@@ -22,6 +22,9 @@ import (
 	companyHourRepositories "na-hora/api/internal/models/company-hour/repositories"
 	companyHourServices "na-hora/api/internal/models/company-hour/services"
 
+	companyHourBlockRepositories "na-hora/api/internal/models/company-hour-block/repositories"
+	companyHourBlockServices "na-hora/api/internal/models/company-hour-block/services"
+
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -93,5 +96,17 @@ var CompanyHourServiceSet = wire.NewSet(
 
 func InitializeCompanyHourService(db *gorm.DB) companyHourServices.CompanyHourServiceInterface {
 	wire.Build(CompanyHourServiceSet)
+	return nil // This line should never be executed; Wire replaces it
+}
+
+// ------------------------------------------------------------------------ //
+
+var CompanyHourBlockServiceSet = wire.NewSet(
+	companyHourBlockRepositories.GetCompanyHourBlockRepository,
+	companyHourBlockServices.GetCompanyHourBlockService,
+)
+
+func InitializeCompanyHourBlockService(db *gorm.DB) companyHourBlockServices.CompanyHourBlockServiceInterface {
+	wire.Build(CompanyHourBlockServiceSet)
 	return nil // This line should never be executed; Wire replaces it
 }

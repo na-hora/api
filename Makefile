@@ -5,7 +5,7 @@ dev:
 		make m-apply; go run cmd/server/main.go
 
 build:
-		go build cmd/server/main.go && ./main
+		go build cmd/server/main.go
 
 m-generate:
 		atlas migrate hash; atlas migrate diff --env gorm $(name)
