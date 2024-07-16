@@ -13,5 +13,6 @@ func VersionedRoutes(r chi.Router, version string) {
 		routes.TokenRoutes(r)
 		routes.StateRoutes(r)
 		routes.CityRoutes(r)
+		routes.ServiceRoutes(r)
 	})
 }
