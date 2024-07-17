@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ServiceRepositoryInterface interface {
+type PetServiceRepositoryInterface interface {
 	Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 }
 
@@ -17,7 +17,7 @@ type ServiceRepository struct {
 	db *gorm.DB
 }
 
-func GetServiceRepository(db *gorm.DB) ServiceRepositoryInterface {
+func GetServiceRepository(db *gorm.DB) PetServiceRepositoryInterface {
 	return &ServiceRepository{db}
 }
 
