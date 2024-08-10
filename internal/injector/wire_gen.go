@@ -17,6 +17,8 @@ import (
 	services6 "na-hora/api/internal/models/company-hour/services"
 	"na-hora/api/internal/models/company/repositories"
 	"na-hora/api/internal/models/company/services"
+	repositories8 "na-hora/api/internal/models/pet-service/repositories"
+	services8 "na-hora/api/internal/models/pet-service/services"
 	repositories4 "na-hora/api/internal/models/state/repositories"
 	services4 "na-hora/api/internal/models/state/services"
 	repositories3 "na-hora/api/internal/models/token/repositories"
@@ -69,6 +71,12 @@ func InitializeCompanyHourBlockService(db *gorm.DB) services7.CompanyHourBlockSe
 	return companyHourBlockServiceInterface
 }
 
+func InitializePetServiceService(db *gorm.DB) services8.PetServiceInterface {
+	petServiceRepositoryInterface := repositories8.GetPetServiceRepository(db)
+	petServiceInterface := services8.GetPetServiceService(petServiceRepositoryInterface, db)
+	return petServiceInterface
+}
+
 // wire.go:
 
 var CompanyServiceSet = wire.NewSet(repositories.GetCompanyRepository, services.GetCompanyService)
@@ -84,3 +92,5 @@ var CityServiceSet = wire.NewSet(repositories5.GetCityRepository, services5.GetC
 var CompanyHourServiceSet = wire.NewSet(repositories6.GetCompanyHourRepository, services6.GetCompanyHourService)
 
 var CompanyHourBlockServiceSet = wire.NewSet(repositories7.GetCompanyHourBlockRepository, services7.GetCompanyHourBlockService)
+
+var PetServiceServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, services8.GetPetServiceService)

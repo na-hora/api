@@ -17,7 +17,7 @@ type PetServiceService struct {
 	petServiceRepository repositories.PetServiceRepositoryInterface
 }
 
-func GetPetServiceServicd(repo repositories.PetServiceRepositoryInterface, tx *gorm.DB) PetServiceInterface {
+func GetPetServiceService(repo repositories.PetServiceRepositoryInterface, tx *gorm.DB) PetServiceInterface {
 	return &PetServiceService{
 		repo,
 	}

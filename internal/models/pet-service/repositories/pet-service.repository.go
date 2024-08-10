@@ -13,15 +13,15 @@ type PetServiceRepositoryInterface interface {
 	Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 }
 
-type ServiceRepository struct {
+type PetServiceRepository struct {
 	db *gorm.DB
 }
 
-func GetServiceRepository(db *gorm.DB) PetServiceRepositoryInterface {
-	return &ServiceRepository{db}
+func GetPetServiceRepository(db *gorm.DB) PetServiceRepositoryInterface {
+	return &PetServiceRepository{db}
 }
 
-func (sr *ServiceRepository) Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError) {
+func (sr *PetServiceRepository) Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError) {
 	if tx == nil {
 		tx = sr.db
 	}
