@@ -11,11 +11,14 @@ import (
 	petServiceServices "na-hora/api/internal/models/pet-service/services"
 	tokenServices "na-hora/api/internal/models/token/services"
 
+	"github.com/go-chi/chi"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type PetServiceInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
+	ListAll(w http.ResponseWriter, r *http.Request)
 }
 
 type petServiceHandler struct {
@@ -56,4 +59,22 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, petServiceCreated)
+}
+
+func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
+	companyId := chi.URLParam(r, "companyId")
+
+	companyIdParsedToUUID, err := uuid.Parse(companyId)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	petServices, appErr := ph.petServiceService.GetByCompanyID(companyIdParsedToUUID, nil)
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, petServices)
 }
