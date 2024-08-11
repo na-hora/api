@@ -13,6 +13,7 @@ import (
 type PetServiceRepositoryInterface interface {
 	Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
+	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
 
 type PetServiceRepository struct {
@@ -59,4 +60,27 @@ func (sr *PetServiceRepository) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB)
 		}
 	}
 	return petService, nil
+}
+
+func (sr *PetServiceRepository) DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	data := tx.Where("id = ?", petServiceID).Delete(&entity.CompanyPetService{})
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	if data.RowsAffected == 0 {
+		return &utils.AppError{
+			Message:    "Pet service not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	return nil
 }

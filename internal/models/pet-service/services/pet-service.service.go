@@ -14,6 +14,7 @@ import (
 type PetServiceInterface interface {
 	CreatePetService(petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]dtos.ListPetServicesByCompany, *utils.AppError)
+	DeleteByPetServiceID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
 
 type PetServiceService struct {
@@ -57,4 +58,13 @@ func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([
 	}
 
 	return responsePetService, nil
+}
+
+func (ps *PetServiceService) DeleteByPetServiceID(petServiceID int, tx *gorm.DB) *utils.AppError {
+	err := ps.petServiceRepository.DeleteByID(petServiceID, tx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

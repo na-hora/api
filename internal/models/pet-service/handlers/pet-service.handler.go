@@ -7,6 +7,7 @@ import (
 	petServiceDTOs "na-hora/api/internal/models/pet-service/dtos"
 	"na-hora/api/internal/utils"
 	"net/http"
+	"strconv"
 
 	petServiceServices "na-hora/api/internal/models/pet-service/services"
 	tokenServices "na-hora/api/internal/models/token/services"
@@ -19,6 +20,7 @@ import (
 type PetServiceInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 	ListAll(w http.ResponseWriter, r *http.Request)
+	DeleteByID(w http.ResponseWriter, r *http.Request)
 }
 
 type petServiceHandler struct {
@@ -77,4 +79,22 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, petServices)
+}
+
+func (ph *petServiceHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
+	serviceId := r.URL.Query().Get("serviceId")
+
+	serviceIdParsedToInt, err := strconv.Atoi(serviceId)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	appErr := ph.petServiceService.DeleteByPetServiceID(serviceIdParsedToInt, nil)
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
