@@ -43,5 +43,5 @@ func (sh *StateHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	utils.ResponseJSON(w, http.StatusCreated, response)
+	utils.ResponseJSON(w, http.StatusOK, response)
 }

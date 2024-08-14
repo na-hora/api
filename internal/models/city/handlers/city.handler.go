@@ -56,7 +56,7 @@ func (ch *CityHandler) ListAllByState(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	utils.ResponseJSON(w, http.StatusCreated, response)
+	utils.ResponseJSON(w, http.StatusOK, response)
 }
 
 func (ch *CityHandler) GetByIBGE(w http.ResponseWriter, r *http.Request) {
@@ -83,5 +83,5 @@ func (ch *CityHandler) GetByIBGE(w http.ResponseWriter, r *http.Request) {
 		Name: cityFound.Name,
 	}}
 
-	utils.ResponseJSON(w, http.StatusCreated, response)
+	utils.ResponseJSON(w, http.StatusOK, response)
 }
