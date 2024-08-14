@@ -27,10 +27,35 @@ func GetPetServiceService(repo repositories.PetServiceRepositoryInterface, tx *g
 	}
 }
 
-func (ps *PetServiceService) CreatePetService(petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError) {
+func (ps *PetServiceService) CreatePetService(
+	petServiceCreate dtos.CreatePetServiceRequestBody,
+	tx *gorm.DB,
+) (*entity.CompanyPetService, *utils.AppError) {
 	petServiceCreated, err := ps.petServiceRepository.Create(petServiceCreate, tx)
 	if err != nil {
 		return nil, err
+	}
+
+	if petServiceCreate.Configurations != nil {
+		for _, configurationParams := range petServiceCreate.Configurations {
+			configuration := dtos.CreateCompanyPetServiceConfigurationParams{
+				Price:               configurationParams.Price,
+				ExecutionTime:       configurationParams.ExecutionTime,
+				CompanyPetServiceID: petServiceCreated.ID,
+				CompanyPetSizeID:    configurationParams.CompanyPetSizeID,
+				CompanyPetHairID:    configurationParams.CompanyPetHairID,
+			}
+
+			_, err := ps.petServiceRepository.CreateConfiguration(
+				petServiceCreated.ID,
+				configuration,
+				tx,
+			)
+
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return petServiceCreated, nil

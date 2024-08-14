@@ -54,9 +54,17 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	petServiceCreated, appErr := ph.petServiceService.CreatePetService(petServicePayload, nil)
+	tx := config.StartTransaction()
+	petServiceCreated, appErr := ph.petServiceService.CreatePetService(petServicePayload, tx)
 	if appErr != nil {
+		tx.Rollback()
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	dbInfo := tx.Commit()
+	if dbInfo.Error != nil {
+		utils.ResponseJSON(w, http.StatusInternalServerError, dbInfo.Error.Error())
 		return
 	}
 
