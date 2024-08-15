@@ -68,7 +68,11 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.ResponseJSON(w, http.StatusCreated, petServiceCreated)
+	response := petServiceDTOs.CreatePetServiceResponse{
+		ID: petServiceCreated.ID,
+	}
+
+	utils.ResponseJSON(w, http.StatusCreated, response)
 }
 
 func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
