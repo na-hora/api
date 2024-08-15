@@ -13,7 +13,7 @@ import (
 
 type PetServiceInterface interface {
 	CreatePetService(petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
-	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]dtos.ListPetServicesByCompany, *utils.AppError)
+	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
 	DeleteByPetServiceID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
 
@@ -61,7 +61,7 @@ func (ps *PetServiceService) CreatePetService(
 	return petServiceCreated, nil
 }
 
-func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]dtos.ListPetServicesByCompany, *utils.AppError) {
+func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError) {
 	petServices, err := ps.petServiceRepository.GetByCompanyID(companyID, tx)
 	if err != nil {
 		return nil, err
@@ -74,15 +74,7 @@ func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([
 		}
 	}
 
-	var responsePetService []dtos.ListPetServicesByCompany
-	for _, petService := range petServices {
-		responsePetService = append(responsePetService, dtos.ListPetServicesByCompany{
-			ID:   petService.ID,
-			Name: petService.Name,
-		})
-	}
-
-	return responsePetService, nil
+	return petServices, nil
 }
 
 func (ps *PetServiceService) DeleteByPetServiceID(petServiceID int, tx *gorm.DB) *utils.AppError {

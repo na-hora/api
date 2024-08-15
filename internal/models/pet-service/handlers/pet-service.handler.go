@@ -86,7 +86,15 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.ResponseJSON(w, http.StatusOK, petServices)
+	var responsePetService []petServiceDTOs.ListPetServicesByCompanyResponse
+	for _, petService := range petServices {
+		responsePetService = append(responsePetService, petServiceDTOs.ListPetServicesByCompanyResponse{
+			ID:   petService.ID,
+			Name: petService.Name,
+		})
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, responsePetService)
 }
 
 func (ph *petServiceHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
