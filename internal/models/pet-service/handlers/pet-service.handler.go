@@ -6,6 +6,7 @@ import (
 	"na-hora/api/internal/injector"
 	petServiceDTOs "na-hora/api/internal/models/pet-service/dtos"
 	"na-hora/api/internal/utils"
+	"na-hora/api/internal/utils/authentication"
 	"net/http"
 	"strconv"
 
@@ -14,7 +15,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
 )
 
 type PetServiceInterface interface {
@@ -76,15 +76,14 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
-	companyId := chi.URLParam(r, "companyId")
+	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
 
-	companyIdParsedToUUID, err := uuid.Parse(companyId)
-	if err != nil {
-		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+	if userErr != nil {
+		utils.ResponseJSON(w, http.StatusUnauthorized, userErr)
 		return
 	}
 
-	petServices, appErr := ph.petServiceService.GetByCompanyID(companyIdParsedToUUID, nil)
+	petServices, appErr := ph.petServiceService.GetByCompanyID(userLogged.CompanyID, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
@@ -102,19 +101,19 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ph *petServiceHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
-	serviceId := r.URL.Query().Get("serviceId")
+	petServiceId := chi.URLParam(r, "ID")
 
-	serviceIdParsedToInt, err := strconv.Atoi(serviceId)
+	petServiceIdParsedToInt, err := strconv.Atoi(petServiceId)
 	if err != nil {
 		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	appErr := ph.petServiceService.DeleteByPetServiceID(serviceIdParsedToInt, nil)
+	appErr := ph.petServiceService.DeleteByID(petServiceIdParsedToInt, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }
