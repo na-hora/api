@@ -11,6 +11,8 @@ import (
 	userDTOs "na-hora/api/internal/models/user/dtos"
 
 	cityServices "na-hora/api/internal/models/city/services"
+	companyPetHairServices "na-hora/api/internal/models/company-pet-hair/services"
+	companyPetSizeServices "na-hora/api/internal/models/company-pet-size/services"
 	companyServices "na-hora/api/internal/models/company/services"
 	tokenServices "na-hora/api/internal/models/token/services"
 	userServices "na-hora/api/internal/models/user/services"
@@ -26,20 +28,26 @@ type CompanyHandlerInterface interface {
 }
 
 type CompanyHandler struct {
-	companyService companyServices.CompanyServiceInterface
-	userService    userServices.UserServiceInterface
-	tokenService   tokenServices.TokenServiceInterface
-	cityService    cityServices.CityServiceInterface
+	companyService        companyServices.CompanyServiceInterface
+	companyPetHairService companyPetHairServices.CompanyPetHairServiceInterface
+	companyPetSizeService companyPetSizeServices.CompanyPetSizeServiceInterface
+	userService           userServices.UserServiceInterface
+	tokenService          tokenServices.TokenServiceInterface
+	cityService           cityServices.CityServiceInterface
 }
 
 func GetCompanyHandler() CompanyHandlerInterface {
 	companyService := injector.InitializeCompanyService(config.DB)
+	companyPetHairService := injector.InitializeCompanyPetHairService(config.DB)
+	companyPetSizeService := injector.InitializeCompanyPetSizeService(config.DB)
 	userService := injector.InitializeUserService(config.DB)
 	tokenService := injector.InitializeTokenService(config.DB)
 	cityService := injector.InitializeCityService(config.DB)
 
 	return &CompanyHandler{
 		companyService,
+		companyPetHairService,
+		companyPetSizeService,
 		userService,
 		tokenService,
 		cityService,
@@ -120,6 +128,22 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 			utils.ResponseJSON(w, addressErr.StatusCode, addressErr.Message)
 			return
 		}
+	}
+
+	hairErr := c.companyPetHairService.CreateDefaultCompanyPetHairs(company.ID, tx)
+
+	if hairErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, hairErr.StatusCode, hairErr.Message)
+		return
+	}
+
+	sizeErr := c.companyPetSizeService.CreateDefaultCompanyPetSizes(company.ID, tx)
+
+	if sizeErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, sizeErr.StatusCode, sizeErr.Message)
+		return
 	}
 
 	tokenErr = c.tokenService.UseCompanyToken(validatorFound.Key, company.ID, tx)

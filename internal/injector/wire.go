@@ -28,6 +28,12 @@ import (
 	petServiceRepositories "na-hora/api/internal/models/pet-service/repositories"
 	petServiceServices "na-hora/api/internal/models/pet-service/services"
 
+	companyPetHairRepositories "na-hora/api/internal/models/company-pet-hair/repositories"
+	companyPetHairServices "na-hora/api/internal/models/company-pet-hair/services"
+
+	companyPetSizeRepositories "na-hora/api/internal/models/company-pet-size/repositories"
+	companyPetSizeServices "na-hora/api/internal/models/company-pet-size/services"
+
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -121,7 +127,31 @@ var PetServiceServiceSet = wire.NewSet(
 	petServiceServices.GetPetServiceService,
 )
 
-func InitializePetServiceService(db *gorm.DB) petServiceServices.PetServiceInterface {
+func InitializePetServiceService(db *gorm.DB) petServiceServices.PetServiceServiceInterface {
 	wire.Build(PetServiceServiceSet)
+	return nil // This line should never be executed; Wire replaces it
+}
+
+// ------------------------------------------------------------------------ //
+
+var CompanyPetHairServiceSet = wire.NewSet(
+	companyPetHairRepositories.GetCompanyPetHairRepository,
+	companyPetHairServices.GetCompanyPetHairService,
+)
+
+func InitializeCompanyPetHairService(db *gorm.DB) companyPetHairServices.CompanyPetHairServiceInterface {
+	wire.Build(CompanyPetHairServiceSet)
+	return nil // This line should never be executed; Wire replaces it
+}
+
+// ------------------------------------------------------------------------ //
+
+var CompanyPetSizeServiceSet = wire.NewSet(
+	companyPetSizeRepositories.GetCompanyPetSizeRepository,
+	companyPetSizeServices.GetCompanyPetSizeService,
+)
+
+func InitializeCompanyPetSizeService(db *gorm.DB) companyPetSizeServices.CompanyPetSizeServiceInterface {
+	wire.Build(CompanyPetSizeServiceSet)
 	return nil // This line should never be executed; Wire replaces it
 }

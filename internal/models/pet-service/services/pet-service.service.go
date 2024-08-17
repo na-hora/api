@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type PetServiceInterface interface {
+type PetServiceServiceInterface interface {
 	CreatePetService(petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
@@ -21,7 +21,7 @@ type PetServiceService struct {
 	petServiceRepository repositories.PetServiceRepositoryInterface
 }
 
-func GetPetServiceService(repo repositories.PetServiceRepositoryInterface, tx *gorm.DB) PetServiceInterface {
+func GetPetServiceService(repo repositories.PetServiceRepositoryInterface, tx *gorm.DB) PetServiceServiceInterface {
 	return &PetServiceService{
 		repo,
 	}

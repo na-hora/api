@@ -15,6 +15,10 @@ import (
 	services7 "na-hora/api/internal/models/company-hour-block/services"
 	repositories6 "na-hora/api/internal/models/company-hour/repositories"
 	services6 "na-hora/api/internal/models/company-hour/services"
+	repositories9 "na-hora/api/internal/models/company-pet-hair/repositories"
+	services9 "na-hora/api/internal/models/company-pet-hair/services"
+	repositories10 "na-hora/api/internal/models/company-pet-size/repositories"
+	services10 "na-hora/api/internal/models/company-pet-size/services"
 	"na-hora/api/internal/models/company/repositories"
 	"na-hora/api/internal/models/company/services"
 	repositories8 "na-hora/api/internal/models/pet-service/repositories"
@@ -71,10 +75,22 @@ func InitializeCompanyHourBlockService(db *gorm.DB) services7.CompanyHourBlockSe
 	return companyHourBlockServiceInterface
 }
 
-func InitializePetServiceService(db *gorm.DB) services8.PetServiceInterface {
+func InitializePetServiceService(db *gorm.DB) services8.PetServiceServiceInterface {
 	petServiceRepositoryInterface := repositories8.GetPetServiceRepository(db)
-	petServiceInterface := services8.GetPetServiceService(petServiceRepositoryInterface, db)
-	return petServiceInterface
+	petServiceServiceInterface := services8.GetPetServiceService(petServiceRepositoryInterface, db)
+	return petServiceServiceInterface
+}
+
+func InitializeCompanyPetHairService(db *gorm.DB) services9.CompanyPetHairServiceInterface {
+	companyPetHairRepositoryInterface := repositories9.GetCompanyPetHairRepository(db)
+	companyPetHairServiceInterface := services9.GetCompanyPetHairService(companyPetHairRepositoryInterface)
+	return companyPetHairServiceInterface
+}
+
+func InitializeCompanyPetSizeService(db *gorm.DB) services10.CompanyPetSizeServiceInterface {
+	companyPetSizeRepositoryInterface := repositories10.GetCompanyPetSizeRepository(db)
+	companyPetSizeServiceInterface := services10.GetCompanyPetSizeService(companyPetSizeRepositoryInterface)
+	return companyPetSizeServiceInterface
 }
 
 // wire.go:
@@ -94,3 +110,7 @@ var CompanyHourServiceSet = wire.NewSet(repositories6.GetCompanyHourRepository, 
 var CompanyHourBlockServiceSet = wire.NewSet(repositories7.GetCompanyHourBlockRepository, services7.GetCompanyHourBlockService)
 
 var PetServiceServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, services8.GetPetServiceService)
+
+var CompanyPetHairServiceSet = wire.NewSet(repositories9.GetCompanyPetHairRepository, services9.GetCompanyPetHairService)
+
+var CompanyPetSizeServiceSet = wire.NewSet(repositories10.GetCompanyPetSizeRepository, services10.GetCompanyPetSizeService)

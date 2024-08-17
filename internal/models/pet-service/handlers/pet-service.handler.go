@@ -17,18 +17,18 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type PetServiceInterface interface {
+type PetServiceHandlerInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 	ListAll(w http.ResponseWriter, r *http.Request)
 	DeleteByID(w http.ResponseWriter, r *http.Request)
 }
 
 type petServiceHandler struct {
-	petServiceService petServiceServices.PetServiceInterface
+	petServiceService petServiceServices.PetServiceServiceInterface
 	tokenService      tokenServices.TokenServiceInterface
 }
 
-func GetPetServiceHandler() PetServiceInterface {
+func GetPetServiceHandler() PetServiceHandlerInterface {
 	petServiceService := injector.InitializePetServiceService(config.DB)
 	tokenService := injector.InitializeTokenService(config.DB)
 
