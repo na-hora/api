@@ -36,7 +36,7 @@ func NewEmailProvider() EmailProviderInterface {
 
 func (e *emailProvider) SendWelcomeEmail(to string) {
 	if viper.Get("ENVIRONMENT") == "local" {
-		fmt.Printf("Tried to send local welcome email to %s", to)
+		fmt.Printf("\nTried to send local welcome email to %s\n\n", to)
 		return
 	}
 
