@@ -13,6 +13,12 @@ import (
 	tokenDTOs "na-hora/api/internal/models/token/dtos"
 	tokenServices "na-hora/api/internal/models/token/services"
 
+	companyPetSizeServices "na-hora/api/internal/models/company-pet-size/services"
+
+	companyPetHairServices "na-hora/api/internal/models/company-pet-hair/services"
+
+	companyServices "na-hora/api/internal/models/company/services"
+
 	"na-hora/api/internal/providers"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
@@ -26,20 +32,28 @@ type UserHandlerInterface interface {
 	Login(w http.ResponseWriter, r *http.Request)
 	ForgotPassword(w http.ResponseWriter, r *http.Request)
 	ResetPassword(w http.ResponseWriter, r *http.Request)
-	// UpdatePassword(w http.ResponseWriter, r *http.Request)
 }
 
 type userHandler struct {
-	userService  userServices.UserServiceInterface
-	tokenService tokenServices.TokenServiceInterface
+	userService           userServices.UserServiceInterface
+	companyService        companyServices.CompanyServiceInterface
+	companyPetSizeService companyPetSizeServices.CompanyPetSizeServiceInterface
+	companyPetHairService companyPetHairServices.CompanyPetHairServiceInterface
+	tokenService          tokenServices.TokenServiceInterface
 }
 
 func GetUserHandler() UserHandlerInterface {
 	userService := injector.InitializeUserService(config.DB)
+	companyService := injector.InitializeCompanyService(config.DB)
+	companyPetSizeService := injector.InitializeCompanyPetSizeService(config.DB)
+	companyPetHairService := injector.InitializeCompanyPetHairService(config.DB)
 	tokenService := injector.InitializeTokenService(config.DB)
 
 	return &userHandler{
 		userService,
+		companyService,
+		companyPetSizeService,
+		companyPetHairService,
 		tokenService,
 	}
 }
@@ -128,9 +142,55 @@ func (u *userHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userCompany, companyErr := u.companyService.GetByID(userChecked.CompanyID, nil)
+	if companyErr != nil {
+		utils.ResponseJSON(w, companyErr.StatusCode, companyErr.Message)
+		return
+	}
+
+	if userCompany == nil {
+		utils.ResponseJSON(w, http.StatusNotFound, "company not found")
+		return
+	}
+
+	companyPetSize, companyPetSizeErr := u.companyPetSizeService.ListByCompanyID(userChecked.CompanyID, nil)
+	if companyPetSizeErr != nil {
+		utils.ResponseJSON(w, companyPetSizeErr.StatusCode, companyPetSizeErr.Message)
+		return
+	}
+
+	var petSizesFormatted []userDTOs.CompanyPetSizesResponse
+	for _, petSize := range companyPetSize {
+		petSizesFormatted = append(petSizesFormatted, userDTOs.CompanyPetSizesResponse{
+			ID:   petSize.ID,
+			Name: petSize.Name,
+		})
+	}
+
+	companyPetHair, companyPetHairErr := u.companyPetHairService.ListByCompanyID(userChecked.CompanyID, nil)
+	if companyPetHairErr != nil {
+		utils.ResponseJSON(w, companyPetHairErr.StatusCode, companyPetHairErr.Message)
+		return
+	}
+
+	var petHairsFormatted []userDTOs.CompanyPetHairsResponse
+	for _, petHair := range companyPetHair {
+		petHairsFormatted = append(petHairsFormatted, userDTOs.CompanyPetHairsResponse{
+			ID:   petHair.ID,
+			Name: petHair.Name,
+		})
+	}
+
 	response := &userDTOs.LoginUserResponse{
 		ID:    user.ID,
 		Token: token,
+		Company: userDTOs.LoginCompanyData{
+			ID:          userCompany.ID,
+			AvatarURL:   userCompany.AvatarUrl,
+			FantasyName: userCompany.FantasyName,
+			PetSizes:    petSizesFormatted,
+			PetHairs:    petHairsFormatted,
+		},
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, response)

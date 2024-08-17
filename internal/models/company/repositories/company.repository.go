@@ -11,6 +11,7 @@ import (
 )
 
 type CompanyRepositoryInterface interface {
+	GetByID(ID uuid.UUID, tx *gorm.DB) (*entity.Company, *utils.AppError)
 	Create(dtos.CreateCompanyRequestBody, *gorm.DB) (*entity.Company, *utils.AppError)
 	CreateAddress(companyID uuid.UUID, insert dtos.CreateCompanyAddressParams, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
 }
@@ -21,6 +22,23 @@ type CompanyRepository struct {
 
 func GetCompanyRepository(db *gorm.DB) CompanyRepositoryInterface {
 	return &CompanyRepository{db}
+}
+
+func (cr *CompanyRepository) GetByID(ID uuid.UUID, tx *gorm.DB) (*entity.Company, *utils.AppError) {
+	if tx == nil {
+		tx = cr.db
+	}
+
+	var company entity.Company
+	data := tx.First(&company, ID)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &company, nil
 }
 
 func (cr *CompanyRepository) Create(insert dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError) {

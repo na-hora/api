@@ -11,6 +11,7 @@ import (
 )
 
 type CompanyServiceInterface interface {
+	GetByID(ID uuid.UUID, tx *gorm.DB) (*entity.Company, *utils.AppError)
 	CreateCompany(companyCreate dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError)
 	CreateAddress(companyID uuid.UUID, addressCreate dtos.CreateCompanyAddressParams, tx *gorm.DB) (*entity.CompanyAddress, *utils.AppError)
 }
@@ -23,6 +24,15 @@ func GetCompanyService(repo repositories.CompanyRepositoryInterface) CompanyServ
 	return &CompanyService{
 		repo,
 	}
+}
+
+func (cs *CompanyService) GetByID(ID uuid.UUID, tx *gorm.DB) (*entity.Company, *utils.AppError) {
+	company, err := cs.companyRepository.GetByID(ID, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return company, nil
 }
 
 func (cs *CompanyService) CreateCompany(companyCreate dtos.CreateCompanyRequestBody, tx *gorm.DB) (*entity.Company, *utils.AppError) {

@@ -6,11 +6,13 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type CompanyPetHairRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetHairParams, *gorm.DB) *utils.AppError
+	ListByCompanyID(uuid.UUID, *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
 }
 
 type CompanyPetHairRepository struct {
@@ -47,4 +49,21 @@ func (chr *CompanyPetHairRepository) CreateMany(insert []dtos.CreateCompanyPetHa
 	}
 
 	return nil
+}
+
+func (chr *CompanyPetHairRepository) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
+	if tx == nil {
+		tx = chr.db
+	}
+
+	var companyPetHairs []entity.CompanyPetHair
+	data := tx.Where("company_id = ?", companyID).Find(&companyPetHairs)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return companyPetHairs, nil
 }

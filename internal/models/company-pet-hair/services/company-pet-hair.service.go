@@ -1,6 +1,7 @@
 package services
 
 import (
+	"na-hora/api/internal/entity"
 	"na-hora/api/internal/models/company-pet-hair/dtos"
 	"na-hora/api/internal/models/company-pet-hair/repositories"
 	"na-hora/api/internal/utils"
@@ -11,6 +12,7 @@ import (
 
 type CompanyPetHairServiceInterface interface {
 	CreateDefaultCompanyPetHairs(companyID uuid.UUID, tx *gorm.DB) *utils.AppError
+	ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
 }
 
 type CompanyPetHairService struct {
@@ -41,4 +43,13 @@ func (chs *CompanyPetHairService) CreateDefaultCompanyPetHairs(companyID uuid.UU
 	}
 
 	return nil
+}
+
+func (chs *CompanyPetHairService) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
+	hairs, err := chs.companyPetHairRepository.ListByCompanyID(companyID, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return hairs, nil
 }
