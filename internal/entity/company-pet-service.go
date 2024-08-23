@@ -8,7 +8,7 @@ import (
 )
 
 type CompanyPetService struct {
-	ID uint `json:"id" gorm:"primaryKey;autoIncrement:true"`
+	ID int `json:"id" gorm:"primaryKey;autoIncrement:true"`
 
 	CompanyID   uuid.UUID `json:"companyId" gorm:"not null"`
 	Name        string    `json:"name" gorm:"not null"`

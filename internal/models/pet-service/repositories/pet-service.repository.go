@@ -11,8 +11,10 @@ import (
 )
 
 type PetServiceRepositoryInterface interface {
-	Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
-	CreateConfiguration(ID uint, insert dtos.CreateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
+	Create(companyID uuid.UUID, insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
+	Update(companyID uuid.UUID, update dtos.UpdateCompanyPetServiceParams, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
+	CreateConfiguration(ID int, insert dtos.CreateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
+	UpdateConfiguration(ID int, insert dtos.UpdateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
@@ -25,13 +27,17 @@ func GetPetServiceRepository(db *gorm.DB) PetServiceRepositoryInterface {
 	return &PetServiceRepository{db}
 }
 
-func (sr *PetServiceRepository) Create(insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError) {
+func (sr *PetServiceRepository) Create(
+	companyID uuid.UUID,
+	insert dtos.CreatePetServiceRequestBody,
+	tx *gorm.DB,
+) (*entity.CompanyPetService, *utils.AppError) {
 	if tx == nil {
 		tx = sr.db
 	}
 
 	insertValue := entity.CompanyPetService{
-		CompanyID:   insert.CompanyID,
+		CompanyID:   companyID,
 		Name:        insert.Name,
 		Paralellism: insert.Paralellism,
 	}
@@ -47,8 +53,35 @@ func (sr *PetServiceRepository) Create(insert dtos.CreatePetServiceRequestBody, 
 	return &insertValue, nil
 }
 
+func (sr *PetServiceRepository) Update(
+	companyID uuid.UUID,
+	insert dtos.UpdateCompanyPetServiceParams,
+	tx *gorm.DB,
+) (*entity.CompanyPetService, *utils.AppError) {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	updateValue := entity.CompanyPetService{
+		ID:          insert.ID,
+		CompanyID:   companyID,
+		Name:        insert.Name,
+		Paralellism: insert.Paralellism,
+	}
+
+	data := tx.Updates(&updateValue)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &updateValue, nil
+}
+
 func (sr *PetServiceRepository) CreateConfiguration(
-	ID uint,
+	companyPetServiceID int,
 	insert dtos.CreateCompanyPetServiceConfigurationParams,
 	tx *gorm.DB,
 ) (*entity.CompanyPetServiceValue, *utils.AppError) {
@@ -57,7 +90,7 @@ func (sr *PetServiceRepository) CreateConfiguration(
 	}
 
 	insertValue := entity.CompanyPetServiceValue{
-		CompanyPetServiceID: ID,
+		CompanyPetServiceID: companyPetServiceID,
 		CompanyPetSizeID:    insert.CompanyPetSizeID,
 		CompanyPetHairID:    insert.CompanyPetHairID,
 		Price:               insert.Price,
@@ -73,6 +106,33 @@ func (sr *PetServiceRepository) CreateConfiguration(
 	}
 
 	return &insertValue, nil
+}
+
+func (sr *PetServiceRepository) UpdateConfiguration(
+	companyPetServiceID int,
+	update dtos.UpdateCompanyPetServiceConfigurationParams,
+	tx *gorm.DB,
+) (*entity.CompanyPetServiceValue, *utils.AppError) {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	updateValue := entity.CompanyPetServiceValue{
+		CompanyPetServiceID: companyPetServiceID,
+		ID:                  update.ID,
+		Price:               update.Price,
+		ExecutionTime:       update.ExecutionTime,
+	}
+
+	data := tx.Updates(&updateValue)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &updateValue, nil
 }
 
 func (sr *PetServiceRepository) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError) {

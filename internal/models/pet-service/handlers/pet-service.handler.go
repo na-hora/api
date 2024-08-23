@@ -7,6 +7,7 @@ import (
 	petServiceDTOs "na-hora/api/internal/models/pet-service/dtos"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
+	"na-hora/api/internal/utils/conversor"
 	"net/http"
 	"strconv"
 
@@ -21,6 +22,7 @@ type PetServiceHandlerInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 	ListAll(w http.ResponseWriter, r *http.Request)
 	DeleteByID(w http.ResponseWriter, r *http.Request)
+	UpdateByID(w http.ResponseWriter, r *http.Request)
 }
 
 type petServiceHandler struct {
@@ -54,8 +56,19 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
 	tx := config.StartTransaction()
-	petServiceCreated, appErr := ph.petServiceService.CreatePetService(petServicePayload, tx)
+	petServiceCreated, appErr := ph.petServiceService.CreatePetService(
+		userLogged.CompanyID,
+		petServicePayload,
+		tx,
+	)
+
 	if appErr != nil {
 		tx.Rollback()
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
@@ -116,4 +129,63 @@ func (ph *petServiceHandler) DeleteByID(w http.ResponseWriter, r *http.Request) 
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (ph *petServiceHandler) UpdateByID(w http.ResponseWriter, r *http.Request) {
+	petServiceId := chi.URLParam(r, "ID")
+
+	strConv := conversor.GetStringConversor()
+	petServiceIdParsedToInt, err := strConv.ToInt(petServiceId)
+
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var petServicePayload petServiceDTOs.UpdatePetServiceRequestBody
+
+	err = json.NewDecoder(r.Body).Decode(&petServicePayload)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err = validate.Struct(petServicePayload)
+	if err != nil {
+		utils.ResponseValidationErrors(err, w)
+		return
+	}
+
+	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	tx := config.StartTransaction()
+	petServiceUpdated, appErr := ph.petServiceService.UpdatePetService(
+		userLogged.CompanyID,
+		petServiceIdParsedToInt,
+		petServicePayload,
+		tx,
+	)
+
+	if appErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	dbInfo := tx.Commit()
+	if dbInfo.Error != nil {
+		utils.ResponseJSON(w, http.StatusInternalServerError, dbInfo.Error.Error())
+		return
+	}
+
+	response := petServiceDTOs.UpdatePetServiceResponse{
+		ID: petServiceUpdated.ID,
+	}
+
+	utils.ResponseJSON(w, http.StatusCreated, response)
 }

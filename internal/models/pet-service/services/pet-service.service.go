@@ -12,7 +12,8 @@ import (
 )
 
 type PetServiceServiceInterface interface {
-	CreatePetService(petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
+	CreatePetService(companyID uuid.UUID, petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
+	UpdatePetService(companyID uuid.UUID, ID int, petServiceUpdate dtos.UpdatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
@@ -28,10 +29,11 @@ func GetPetServiceService(repo repositories.PetServiceRepositoryInterface, tx *g
 }
 
 func (ps *PetServiceService) CreatePetService(
+	companyID uuid.UUID,
 	petServiceCreate dtos.CreatePetServiceRequestBody,
 	tx *gorm.DB,
 ) (*entity.CompanyPetService, *utils.AppError) {
-	petServiceCreated, err := ps.petServiceRepository.Create(petServiceCreate, tx)
+	petServiceCreated, err := ps.petServiceRepository.Create(companyID, petServiceCreate, tx)
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +61,44 @@ func (ps *PetServiceService) CreatePetService(
 	}
 
 	return petServiceCreated, nil
+}
+
+func (ps *PetServiceService) UpdatePetService(
+	companyID uuid.UUID,
+	ID int,
+	petServiceUpdate dtos.UpdatePetServiceRequestBody,
+	tx *gorm.DB,
+) (*entity.CompanyPetService, *utils.AppError) {
+	petServiceUpdated, err := ps.petServiceRepository.Update(companyID, dtos.UpdateCompanyPetServiceParams{
+		ID:          ID,
+		Name:        petServiceUpdate.Name,
+		Paralellism: petServiceUpdate.Paralellism,
+	}, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	if petServiceUpdate.Configurations != nil {
+		for _, configurationParams := range petServiceUpdate.Configurations {
+			configuration := dtos.UpdateCompanyPetServiceConfigurationParams{
+				ID:            configurationParams.CompanyPetServiceValueID,
+				Price:         configurationParams.Price,
+				ExecutionTime: configurationParams.ExecutionTime,
+			}
+
+			_, err := ps.petServiceRepository.UpdateConfiguration(
+				petServiceUpdated.ID,
+				configuration,
+				tx,
+			)
+
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return petServiceUpdated, nil
 }
 
 func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError) {

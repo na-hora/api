@@ -7,11 +7,11 @@ import (
 )
 
 type CompanyPetServiceValue struct {
-	ID uint `json:"id" gorm:"primaryKey;autoIncrement:true"`
+	ID int `json:"id" gorm:"primaryKey;autoIncrement:true"`
 
-	CompanyPetServiceID uint    `json:"companyPetServiceId" gorm:"not null"`
-	CompanyPetSizeID    uint    `json:"companyPetSizeId" gorm:"not null"`
-	CompanyPetHairID    uint    `json:"companyPetHairId" gorm:"not null"`
+	CompanyPetServiceID int     `json:"companyPetServiceId" gorm:"not null"`
+	CompanyPetSizeID    int     `json:"companyPetSizeId" gorm:"not null"`
+	CompanyPetHairID    int     `json:"companyPetHairId" gorm:"not null"`
 	Price               float64 `json:"price" gorm:"not null"`
 	ExecutionTime       int     `json:"executionTime" gorm:"not null"`
 

@@ -19,6 +19,7 @@ func PetServiceRoutes(r chi.Router) {
 			r.Post("/", petServiceHandler.Register)
 			r.Get("/", petServiceHandler.ListAll)
 			r.Delete("/{ID}", petServiceHandler.DeleteByID)
+			r.Put("/{ID}", petServiceHandler.UpdateByID)
 		})
 	})
 }
