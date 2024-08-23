@@ -21,6 +21,7 @@ import (
 type PetServiceHandlerInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 	ListAll(w http.ResponseWriter, r *http.Request)
+	GetByID(w http.ResponseWriter, r *http.Request)
 	DeleteByID(w http.ResponseWriter, r *http.Request)
 	UpdateByID(w http.ResponseWriter, r *http.Request)
 }
@@ -107,6 +108,41 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 		responsePetService = append(responsePetService, petServiceDTOs.ListPetServicesByCompanyResponse{
 			ID:   petService.ID,
 			Name: petService.Name,
+		})
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, responsePetService)
+}
+
+func (ph *petServiceHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	ID := chi.URLParam(r, "ID")
+
+	strConv := conversor.GetStringConversor()
+	IDParsedToInt, err := strConv.ToInt(ID)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	petService, appErr := ph.petServiceService.GetByID(IDParsedToInt, nil)
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	var responsePetService petServiceDTOs.GetPetServiceByIDResponse
+
+	responsePetService.ID = petService.ID
+	responsePetService.Name = petService.Name
+	responsePetService.Paralellism = petService.Paralellism
+
+	for _, configuration := range petService.Configurations {
+		responsePetService.Configurations = append(responsePetService.Configurations, petServiceDTOs.PetServiceConfiguration{
+			ID:               configuration.ID,
+			Price:            configuration.Price,
+			ExecutionTime:    configuration.ExecutionTime,
+			CompanyPetHairID: configuration.CompanyPetHairID,
+			CompanyPetSizeID: configuration.CompanyPetSizeID,
 		})
 	}
 

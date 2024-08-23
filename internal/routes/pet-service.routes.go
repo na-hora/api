@@ -18,6 +18,7 @@ func PetServiceRoutes(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.Post("/", petServiceHandler.Register)
 			r.Get("/", petServiceHandler.ListAll)
+			r.Get("/{ID}", petServiceHandler.GetByID)
 			r.Delete("/{ID}", petServiceHandler.DeleteByID)
 			r.Put("/{ID}", petServiceHandler.UpdateByID)
 		})

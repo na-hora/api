@@ -15,6 +15,7 @@ type PetServiceServiceInterface interface {
 	CreatePetService(companyID uuid.UUID, petServiceCreate dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	UpdatePetService(companyID uuid.UUID, ID int, petServiceUpdate dtos.UpdatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
+	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
 
@@ -115,6 +116,15 @@ func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([
 	}
 
 	return petServices, nil
+}
+
+func (ps *PetServiceService) GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError) {
+	petService, err := ps.petServiceRepository.GetByID(ID, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return petService, nil
 }
 
 func (ps *PetServiceService) DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError {

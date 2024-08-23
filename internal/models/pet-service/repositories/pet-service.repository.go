@@ -16,6 +16,7 @@ type PetServiceRepositoryInterface interface {
 	CreateConfiguration(ID int, insert dtos.CreateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	UpdateConfiguration(ID int, insert dtos.UpdateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
+	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
 
@@ -149,6 +150,24 @@ func (sr *PetServiceRepository) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB)
 		}
 	}
 	return petService, nil
+}
+
+func (sr *PetServiceRepository) GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError) {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	petService := entity.CompanyPetService{}
+	data := tx.Where("id = ?", ID).Preload("Configurations").First(&petService)
+
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &petService, nil
 }
 
 func (sr *PetServiceRepository) DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError {

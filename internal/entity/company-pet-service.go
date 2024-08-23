@@ -18,7 +18,8 @@ type CompanyPetService struct {
 	UpdatedAt time.Time      `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 
-	Company Company `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
+	Company        Company                  `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
+	Configurations []CompanyPetServiceValue `json:"configurations" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyPetServiceID;references:ID;"`
 }
 
 func (CompanyPetService) TableName() string {
