@@ -164,7 +164,7 @@ func (ph *petServiceHandler) DeleteByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (ph *petServiceHandler) UpdateByID(w http.ResponseWriter, r *http.Request) {
