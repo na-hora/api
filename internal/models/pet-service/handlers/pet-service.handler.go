@@ -103,7 +103,7 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var responsePetService []petServiceDTOs.ListPetServicesByCompanyResponse
+	var responsePetService = make([]petServiceDTOs.ListPetServicesByCompanyResponse, 0)
 	for _, petService := range petServices {
 		responsePetService = append(responsePetService, petServiceDTOs.ListPetServicesByCompanyResponse{
 			ID:   petService.ID,

@@ -5,7 +5,6 @@ import (
 	"na-hora/api/internal/models/pet-service/dtos"
 	"na-hora/api/internal/models/pet-service/repositories"
 	"na-hora/api/internal/utils"
-	"net/http"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -106,13 +105,6 @@ func (ps *PetServiceService) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([
 	petServices, err := ps.petServiceRepository.GetByCompanyID(companyID, tx)
 	if err != nil {
 		return nil, err
-	}
-
-	if len(petServices) == 0 {
-		return nil, &utils.AppError{
-			Message:    "pet services not found",
-			StatusCode: http.StatusNotFound,
-		}
 	}
 
 	return petServices, nil
