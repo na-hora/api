@@ -130,6 +130,11 @@ func (ph *petServiceHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if petService == nil {
+		utils.ResponseJSON(w, http.StatusNotFound, "pet service not found")
+		return
+	}
+
 	var responsePetService petServiceDTOs.GetPetServiceByIDResponse
 
 	responsePetService.ID = petService.ID

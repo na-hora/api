@@ -161,10 +161,14 @@ func (sr *PetServiceRepository) GetByID(ID int, tx *gorm.DB) (*entity.CompanyPet
 	data := tx.Where("id = ?", ID).Preload("Configurations").First(&petService)
 
 	if data.Error != nil {
-		return nil, &utils.AppError{
-			Message:    data.Error.Error(),
-			StatusCode: http.StatusInternalServerError,
+		if data.Error != gorm.ErrRecordNotFound {
+			return nil, &utils.AppError{
+				Message:    data.Error.Error(),
+				StatusCode: http.StatusInternalServerError,
+			}
 		}
+
+		return nil, nil
 	}
 
 	return &petService, nil
