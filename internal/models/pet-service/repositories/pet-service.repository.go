@@ -17,6 +17,7 @@ type PetServiceRepositoryInterface interface {
 	UpdateConfiguration(ID int, insert dtos.UpdateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
 	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
+	GetConfigurationBySizeAndHair(companyPetServiceID int, sizeID int, hairID int, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 }
 
@@ -56,7 +57,7 @@ func (sr *PetServiceRepository) Create(
 
 func (sr *PetServiceRepository) Update(
 	companyID uuid.UUID,
-	insert dtos.UpdateCompanyPetServiceParams,
+	update dtos.UpdateCompanyPetServiceParams,
 	tx *gorm.DB,
 ) (*entity.CompanyPetService, *utils.AppError) {
 	if tx == nil {
@@ -64,10 +65,10 @@ func (sr *PetServiceRepository) Update(
 	}
 
 	updateValue := entity.CompanyPetService{
-		ID:          insert.ID,
+		ID:          update.ID,
 		CompanyID:   companyID,
-		Name:        insert.Name,
-		Paralellism: insert.Paralellism,
+		Name:        update.Name,
+		Paralellism: update.Paralellism,
 	}
 
 	data := tx.Updates(&updateValue)
@@ -172,6 +173,38 @@ func (sr *PetServiceRepository) GetByID(ID int, tx *gorm.DB) (*entity.CompanyPet
 	}
 
 	return &petService, nil
+}
+
+func (sr *PetServiceRepository) GetConfigurationBySizeAndHair(
+	companyPetServiceID int,
+	sizeID int,
+	hairID int,
+	tx *gorm.DB,
+) (*entity.CompanyPetServiceValue, *utils.AppError) {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	petServiceValue := entity.CompanyPetServiceValue{}
+	data := tx.Where(
+		"company_pet_service_id = ? AND company_pet_size_id = ? AND company_pet_hair_id = ?",
+		companyPetServiceID,
+		sizeID,
+		hairID,
+	).First(&petServiceValue)
+
+	if data.Error != nil {
+		if data.Error != gorm.ErrRecordNotFound {
+			return nil, &utils.AppError{
+				Message:    data.Error.Error(),
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+
+		return nil, nil
+	}
+
+	return &petServiceValue, nil
 }
 
 func (sr *PetServiceRepository) DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError {

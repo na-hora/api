@@ -20,7 +20,8 @@ type UpdatePetServiceRequestBody struct {
 }
 
 type PetServiceConfigurationToUpdate struct {
-	CompanyPetServiceValueID int     `json:"companyPetServiceValueId" validate:"required"`
-	Price                    float64 `json:"price" validate:"required"`
-	ExecutionTime            int     `json:"executionTime" validate:"required"`
+	CompanyPetHairID int     `json:"companyPetHairId" validate:"required"`
+	CompanyPetSizeID int     `json:"companyPetSizeId" validate:"required"`
+	Price            float64 `json:"price" validate:"required"`
+	ExecutionTime    int     `json:"executionTime" validate:"required"`
 }

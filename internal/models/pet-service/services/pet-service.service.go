@@ -80,20 +80,33 @@ func (ps *PetServiceService) UpdatePetService(
 
 	if petServiceUpdate.Configurations != nil {
 		for _, configurationParams := range petServiceUpdate.Configurations {
-			configuration := dtos.UpdateCompanyPetServiceConfigurationParams{
-				ID:            configurationParams.CompanyPetServiceValueID,
-				Price:         configurationParams.Price,
-				ExecutionTime: configurationParams.ExecutionTime,
-			}
-
-			_, err := ps.petServiceRepository.UpdateConfiguration(
-				petServiceUpdated.ID,
-				configuration,
+			configurationFound, sErr := ps.petServiceRepository.GetConfigurationBySizeAndHair(
+				ID,
+				configurationParams.CompanyPetSizeID,
+				configurationParams.CompanyPetHairID,
 				tx,
 			)
 
-			if err != nil {
-				return nil, err
+			if sErr != nil {
+				return nil, sErr
+			}
+
+			if configurationFound != nil {
+				configuration := dtos.UpdateCompanyPetServiceConfigurationParams{
+					ID:            configurationFound.ID,
+					Price:         configurationParams.Price,
+					ExecutionTime: configurationParams.ExecutionTime,
+				}
+
+				_, err := ps.petServiceRepository.UpdateConfiguration(
+					petServiceUpdated.ID,
+					configuration,
+					tx,
+				)
+
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 	}
