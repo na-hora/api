@@ -1,20 +1,19 @@
 version: "3.9"
-name: na-hora
 
-services: 
-    na_hora_pg:
-        image: postgres:latest
-        container_name: na_hora_pg
-        restart: always
-        ports: 
-            - 5432:5432
-        environment: 
-            - POSTGRES_USER=admin
-            - POSTGRES_PASSWORD=admin
-            - POSTGRES_DB=na-hora
-        volumes: 
-            - pgdata:/data/postgres
+services:
+  na_hora_pg:
+    image: postgres:latest
+    container_name: na_hora_pg
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=na-hora
+    volumes:
+      - pgdata:/data/postgres
 
-volumes: 
-    pgdata:
-        driver: local
+volumes:
+  pgdata:
+    driver: local
