@@ -42,7 +42,7 @@ func (chh *CompanyHourBlockHandler) CreateMany(w http.ResponseWriter, r *http.Re
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(companyHourBlockPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 

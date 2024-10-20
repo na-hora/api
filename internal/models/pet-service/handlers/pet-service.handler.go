@@ -53,7 +53,7 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(petServicePayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 
@@ -194,7 +194,7 @@ func (ph *petServiceHandler) UpdateByID(w http.ResponseWriter, r *http.Request) 
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(petServicePayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 

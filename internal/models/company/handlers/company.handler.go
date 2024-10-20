@@ -66,7 +66,7 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(companyPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 

@@ -70,7 +70,7 @@ func (u *userHandler) Register(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(userPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 
@@ -110,7 +110,7 @@ func (u *userHandler) Login(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(userPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 
@@ -208,7 +208,7 @@ func (u *userHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(userPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 
@@ -253,7 +253,7 @@ func (u *userHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(userPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 

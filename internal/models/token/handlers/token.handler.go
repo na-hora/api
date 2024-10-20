@@ -41,7 +41,7 @@ func (th *TokenHandler) GenerateRegisterLink(w http.ResponseWriter, r *http.Requ
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	err = validate.Struct(tokenPayload)
 	if err != nil {
-		utils.ResponseValidationErrors(err, w)
+		utils.ResponseValidationErrors(err, w, "body")
 		return
 	}
 

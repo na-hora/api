@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"github.com/go-playground/validator/v10"
 	"net/http"
 	"strings"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type AppError struct {
@@ -12,9 +13,9 @@ type AppError struct {
 	StatusCode int
 }
 
-func ResponseValidationErrors(err error, w http.ResponseWriter) {
+func ResponseValidationErrors(err error, w http.ResponseWriter, origin string) {
 	if errors, ok := err.(validator.ValidationErrors); ok {
-		errorsResponse := translateErrors(errors)
+		errorsResponse := translateErrors(errors, origin)
 
 		ResponseJSON(w, http.StatusBadRequest, errorsResponse)
 		return
@@ -23,10 +24,10 @@ func ResponseValidationErrors(err error, w http.ResponseWriter) {
 	ResponseJSON(w, http.StatusInternalServerError, nil)
 }
 
-func translateErrors(errors validator.ValidationErrors) map[string]string {
+func translateErrors(errors validator.ValidationErrors, origin string) map[string]string {
 	errorResponses := make(map[string]string)
 	for _, error := range errors {
-		errorResponses[strings.ToLower(error.Field())] = formatError(error)
+		errorResponses[strings.ToLower(error.Field())] = fmt.Sprintf(formatError(error)+" in %s", origin)
 	}
 
 	return errorResponses
@@ -35,10 +36,10 @@ func translateErrors(errors validator.ValidationErrors) map[string]string {
 func formatError(e validator.FieldError) string {
 	switch e.Tag() {
 	case "required":
-		return fmt.Sprintf("required")
+		return "required"
 	case "email":
 		return "invalid"
 	default:
-		return fmt.Sprintf("validation failed")
+		return "validation failed"
 	}
 }
