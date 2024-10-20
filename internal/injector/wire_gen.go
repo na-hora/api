@@ -9,6 +9,8 @@ package injector
 import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
+	repositories11 "na-hora/api/internal/models/appointment/repositories"
+	services11 "na-hora/api/internal/models/appointment/services"
 	repositories5 "na-hora/api/internal/models/city/repositories"
 	services5 "na-hora/api/internal/models/city/services"
 	repositories7 "na-hora/api/internal/models/company-hour-block/repositories"
@@ -93,6 +95,12 @@ func InitializeCompanyPetSizeService(db *gorm.DB) services10.CompanyPetSizeServi
 	return companyPetSizeServiceInterface
 }
 
+func InitializeAppointmentService(db *gorm.DB) services11.AppointmentServiceInterface {
+	appointmentRepositoryInterface := repositories11.GetAppointmentRepository(db)
+	appointmentServiceInterface := services11.GetAppointmentService(appointmentRepositoryInterface)
+	return appointmentServiceInterface
+}
+
 // wire.go:
 
 var CompanyServiceSet = wire.NewSet(repositories.GetCompanyRepository, services.GetCompanyService)
@@ -114,3 +122,5 @@ var PetServiceServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, se
 var CompanyPetHairServiceSet = wire.NewSet(repositories9.GetCompanyPetHairRepository, services9.GetCompanyPetHairService)
 
 var CompanyPetSizeServiceSet = wire.NewSet(repositories10.GetCompanyPetSizeRepository, services10.GetCompanyPetSizeService)
+
+var AppointmentServiceSet = wire.NewSet(repositories11.GetAppointmentRepository, services11.GetAppointmentService)

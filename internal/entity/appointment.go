@@ -10,7 +10,7 @@ type Appointment struct {
 	ID                       uuid.UUID `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid();"`
 	CompanyID                uuid.UUID `json:"companyId" gorm:"not null"`
 	ClientID                 uuid.UUID `json:"clientId" gorm:"not null"`
-	CompanyPetServiceValueID uuid.UUID `json:"CompanyPetServiceValueId" gorm:"not null"`
+	CompanyPetServiceValueID int       `json:"CompanyPetServiceValueId" gorm:"not null"`
 	PetName                  string    `json:"petName"`
 	Note                     string    `json:"note"`
 	StartTime                time.Time `json:"startTime" gorm:"not null"`

@@ -34,6 +34,9 @@ import (
 	companyPetSizeRepositories "na-hora/api/internal/models/company-pet-size/repositories"
 	companyPetSizeServices "na-hora/api/internal/models/company-pet-size/services"
 
+	appointmentRepositories "na-hora/api/internal/models/appointment/repositories"
+	appointmentServices "na-hora/api/internal/models/appointment/services"
+
 	"github.com/google/wire"
 	"gorm.io/gorm"
 )
@@ -153,5 +156,17 @@ var CompanyPetSizeServiceSet = wire.NewSet(
 
 func InitializeCompanyPetSizeService(db *gorm.DB) companyPetSizeServices.CompanyPetSizeServiceInterface {
 	wire.Build(CompanyPetSizeServiceSet)
+	return nil // This line should never be executed; Wire replaces it
+}
+
+// ------------------------------------------------------------------------ //
+
+var AppointmentServiceSet = wire.NewSet(
+	appointmentRepositories.GetAppointmentRepository,
+	appointmentServices.GetAppointmentService,
+)
+
+func InitializeAppointmentService(db *gorm.DB) appointmentServices.AppointmentServiceInterface {
+	wire.Build(AppointmentServiceSet)
 	return nil // This line should never be executed; Wire replaces it
 }
