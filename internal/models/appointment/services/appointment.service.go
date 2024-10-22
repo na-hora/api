@@ -2,31 +2,82 @@ package services
 
 import (
 	"na-hora/api/internal/entity"
-	"na-hora/api/internal/models/appointment/repositories"
+	"na-hora/api/internal/models/appointment/dtos"
+	appointmentRepository "na-hora/api/internal/models/appointment/repositories"
+	petServiceRepository "na-hora/api/internal/models/pet-service/repositories"
 	"na-hora/api/internal/utils"
+	"net/http"
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type AppointmentServiceInterface interface {
 	List(companyID uuid.UUID, startDate time.Time, endDate time.Time) ([]entity.Appointment, *utils.AppError)
+	Create(companyID uuid.UUID, insert dtos.CreateAppointmentsRequestBody, tx *gorm.DB) (*entity.Appointment, *utils.AppError)
 }
 
 type AppointmentService struct {
-	appointmentRepository repositories.AppointmentRepositoryInterface
+	appointmentRepo appointmentRepository.AppointmentRepositoryInterface
+	petServiceRepo  petServiceRepository.PetServiceRepositoryInterface
 }
 
-func GetAppointmentService(repo repositories.AppointmentRepositoryInterface) AppointmentServiceInterface {
+func GetAppointmentService(
+	appointmentRepo appointmentRepository.AppointmentRepositoryInterface,
+	petServiceRepo petServiceRepository.PetServiceRepositoryInterface,
+) AppointmentServiceInterface {
 	return &AppointmentService{
-		repo,
+		appointmentRepo,
+		petServiceRepo,
 	}
 }
 
-func (cs *AppointmentService) List(companyID uuid.UUID, startDate time.Time, endDate time.Time) ([]entity.Appointment, *utils.AppError) {
-	allAppointments, err := cs.appointmentRepository.List(companyID, startDate, endDate)
+func (as *AppointmentService) List(companyID uuid.UUID, startDate time.Time, endDate time.Time) ([]entity.Appointment, *utils.AppError) {
+	allAppointments, err := as.appointmentRepo.List(companyID, startDate, endDate)
 	if err != nil {
 		return nil, err
 	}
 	return allAppointments, nil
+}
+
+func (as *AppointmentService) Create(companyID uuid.UUID, insert dtos.CreateAppointmentsRequestBody, tx *gorm.DB) (*entity.Appointment, *utils.AppError) {
+	companyPetServiceValue, appErr := as.petServiceRepo.GetConfigurationById(
+		insert.CompanyPetServiceValueID,
+	)
+
+	if appErr != nil {
+		return nil, appErr
+	}
+
+	if companyPetServiceValue == nil {
+		return nil, &utils.AppError{
+			Message:    "pet service value not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	createParams := dtos.CreateAppointmentParams{
+		ClientID:                 insert.ClientID,
+		CompanyPetServiceValueID: insert.CompanyPetServiceValueID,
+		StartTime:                insert.StartTime,
+		PetName:                  insert.PetName,
+		PaymentMode:              insert.PaymentMode,
+		Note:                     insert.Note,
+		TotalTime:                companyPetServiceValue.ExecutionTime,
+		TotalPrice:               companyPetServiceValue.Price,
+		Canceled:                 false,
+	}
+
+	appointmentCreated, err := as.appointmentRepo.Create(
+		companyID,
+		createParams,
+		tx,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return appointmentCreated, nil
 }

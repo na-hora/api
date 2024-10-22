@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
@@ -10,11 +12,15 @@ import (
 	"na-hora/api/internal/utils/authentication"
 	"na-hora/api/internal/utils/conversor"
 	"net/http"
+	"sync"
+
+	"github.com/google/uuid"
 )
 
 type AppointmentHandlerInterface interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	List(w http.ResponseWriter, r *http.Request)
+	SseUpdates(w http.ResponseWriter, r *http.Request)
 }
 
 type AppointmentHandler struct {
@@ -28,12 +34,42 @@ func GetAppointmentHandler() AppointmentHandlerInterface {
 	}
 }
 
+type ConnectedClient struct {
+	CompanyID uuid.UUID
+	UserID    uuid.UUID
+	Username  string
+}
+
+var (
+	connectedClients = make(map[http.ResponseWriter]ConnectedClient)
+	mu               sync.Mutex
+)
+
 func (ah *AppointmentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	body := ctx.Value(utils.ValidatedBodyKey).(*dtos.CreateAppointmentsRequestBody)
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(fmt.Sprintf("%s", body.StartDate)))
+	appointment, appErr := ah.appointmentService.Create(body.CompanyID, *body, nil)
+
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	response := &dtos.CreateAppointmentResponse{
+		ID:        appointment.ID,
+		StartTime: appointment.StartTime,
+		TotalTime: appointment.TotalTime,
+	}
+
+	notificationErr := notifyClients(*response, body.CompanyID)
+
+	if notificationErr != nil {
+		utils.ResponseJSON(w, notificationErr.StatusCode, notificationErr.Message)
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, response)
 }
 
 func (ah *AppointmentHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -100,4 +136,81 @@ func (ah *AppointmentHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, response)
+}
+
+func (ah *AppointmentHandler) SseUpdates(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Connection", "keep-alive")
+
+	if f, ok := w.(http.Flusher); ok {
+		f.Flush()
+	}
+
+	ctx := r.Context()
+	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	mu.Lock()
+	connectedClients[w] = ConnectedClient{
+		CompanyID: userLogged.CompanyID,
+		UserID:    userLogged.ID,
+		Username:  userLogged.Username,
+	}
+	mu.Unlock()
+
+	defer func() {
+		mu.Lock()
+		if _, exists := connectedClients[w]; exists {
+			delete(connectedClients, w)
+			fmt.Println("Client disconnected and removed:", userLogged.Username)
+		}
+		mu.Unlock()
+	}()
+
+	go func() {
+		<-ctx.Done()
+		mu.Lock()
+		if _, exists := connectedClients[w]; exists {
+			delete(connectedClients, w)
+			fmt.Println("Removed client on disconnect:", userLogged.Username)
+		}
+		mu.Unlock()
+	}()
+
+	select {}
+}
+
+func notifyClients(
+	appointment dtos.CreateAppointmentResponse,
+	companyID uuid.UUID,
+) *utils.AppError {
+	mu.Lock()
+	for clientWriter, clientInfo := range connectedClients {
+		if clientInfo.CompanyID == companyID {
+			var buf bytes.Buffer
+			enc := json.NewEncoder(&buf)
+
+			if err := enc.Encode(appointment); err != nil {
+
+				mu.Unlock()
+				return &utils.AppError{
+					Message:    "Failed to encode appointment",
+					StatusCode: http.StatusInternalServerError,
+				}
+			}
+
+			fmt.Fprintf(clientWriter, "data: %s\n\n", buf.String())
+			if f, ok := clientWriter.(http.Flusher); ok {
+				f.Flush()
+			}
+		}
+	}
+	mu.Unlock()
+	return nil
 }

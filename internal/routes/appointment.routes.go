@@ -23,6 +23,7 @@ func AppointmentRoutes(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.With(middlewares.ValidateStructBody(&dtos.CreateAppointmentsRequestBody{})).Post("/", appointmentHandler.Create)
 			r.Get("/", appointmentHandler.List)
+			r.Get("/notifications", appointmentHandler.SseUpdates)
 		})
 	})
 }

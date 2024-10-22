@@ -19,6 +19,7 @@ type PetServiceRepositoryInterface interface {
 	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetConfigurationBySizeAndHair(companyPetServiceID int, sizeID int, hairID int, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
+	GetConfigurationById(companyPetServiceID int) (*entity.CompanyPetServiceValue, *utils.AppError)
 }
 
 type PetServiceRepository struct {
@@ -80,6 +81,26 @@ func (sr *PetServiceRepository) Update(
 	}
 
 	return &updateValue, nil
+}
+
+func (sr *PetServiceRepository) GetConfigurationById(
+	companyPetServiceID int,
+) (*entity.CompanyPetServiceValue, *utils.AppError) {
+	petServiceValue := entity.CompanyPetServiceValue{}
+
+	data := sr.db.Where(
+		"company_pet_service_id = ?",
+		companyPetServiceID,
+	).First(&petServiceValue)
+
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &petServiceValue, nil
 }
 
 func (sr *PetServiceRepository) CreateConfiguration(

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"na-hora/api/internal/entity"
+	"na-hora/api/internal/models/appointment/dtos"
 	"na-hora/api/internal/utils"
 	"net/http"
 	"time"
@@ -12,6 +13,7 @@ import (
 
 type AppointmentRepositoryInterface interface {
 	List(companyID uuid.UUID, startDate time.Time, endDate time.Time) ([]entity.Appointment, *utils.AppError)
+	Create(companyID uuid.UUID, insert dtos.CreateAppointmentParams, tx *gorm.DB) (*entity.Appointment, *utils.AppError)
 }
 
 type AppointmentRepository struct {
@@ -33,4 +35,38 @@ func (cr *AppointmentRepository) List(companyID uuid.UUID, startDate time.Time, 
 		}
 	}
 	return allAppointments, nil
+}
+
+func (ar *AppointmentRepository) Create(
+	companyID uuid.UUID,
+	insert dtos.CreateAppointmentParams,
+	tx *gorm.DB,
+) (*entity.Appointment, *utils.AppError) {
+	if tx == nil {
+		tx = ar.db
+	}
+
+	appointment := entity.Appointment{
+		CompanyID:                companyID,
+		StartTime:                insert.StartTime,
+		ClientID:                 insert.ClientID,
+		PetName:                  insert.PetName,
+		Note:                     insert.Note,
+		PaymentMode:              insert.PaymentMode,
+		CompanyPetServiceValueID: insert.CompanyPetServiceValueID,
+		TotalTime:                insert.TotalTime,
+		TotalPrice:               insert.TotalPrice,
+		Canceled:                 insert.Canceled,
+	}
+
+	data := tx.Create(&appointment)
+
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return &appointment, nil
 }

@@ -97,7 +97,8 @@ func InitializeCompanyPetSizeService(db *gorm.DB) services10.CompanyPetSizeServi
 
 func InitializeAppointmentService(db *gorm.DB) services11.AppointmentServiceInterface {
 	appointmentRepositoryInterface := repositories11.GetAppointmentRepository(db)
-	appointmentServiceInterface := services11.GetAppointmentService(appointmentRepositoryInterface)
+	petServiceRepositoryInterface := repositories8.GetPetServiceRepository(db)
+	appointmentServiceInterface := services11.GetAppointmentService(appointmentRepositoryInterface, petServiceRepositoryInterface)
 	return appointmentServiceInterface
 }
 
@@ -123,4 +124,4 @@ var CompanyPetHairServiceSet = wire.NewSet(repositories9.GetCompanyPetHairReposi
 
 var CompanyPetSizeServiceSet = wire.NewSet(repositories10.GetCompanyPetSizeRepository, services10.GetCompanyPetSizeService)
 
-var AppointmentServiceSet = wire.NewSet(repositories11.GetAppointmentRepository, services11.GetAppointmentService)
+var AppointmentServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, repositories11.GetAppointmentRepository, services11.GetAppointmentService)

@@ -162,6 +162,7 @@ func InitializeCompanyPetSizeService(db *gorm.DB) companyPetSizeServices.Company
 // ------------------------------------------------------------------------ //
 
 var AppointmentServiceSet = wire.NewSet(
+	petServiceRepositories.GetPetServiceRepository,
 	appointmentRepositories.GetAppointmentRepository,
 	appointmentServices.GetAppointmentService,
 )

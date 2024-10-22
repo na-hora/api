@@ -1,9 +1,20 @@
 package dtos
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type ListAppointmentsResponse struct {
 	Appointments []Appointment `json:"appointments"`
+}
+
+type CreateAppointmentResponse struct {
+	ID uuid.UUID `json:"id"`
+
+	StartTime time.Time `json:"startTime"`
+	TotalTime int       `json:"totalTime"`
 }
 
 type Appointment struct {
