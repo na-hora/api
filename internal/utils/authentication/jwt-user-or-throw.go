@@ -51,3 +51,45 @@ func JwtUserOrThrow(ctx context.Context) (*UserLogged, *utils.AppError) {
 		CompanyID: userFound.CompanyID,
 	}, nil
 }
+
+func UserFromStringToken(stringToken string) (*UserLogged, *utils.AppError) {
+	_, claims, error := authentication.ValidateToken(stringToken)
+
+	if error != nil {
+		return nil, &utils.AppError{
+			Message:    error.Error(),
+			StatusCode: http.StatusUnauthorized,
+		}
+	}
+
+	ID := claims["sub"]
+
+	if ID == nil {
+		return nil, &utils.AppError{
+			Message:    "Invalid token",
+			StatusCode: http.StatusUnauthorized,
+		}
+	}
+
+	parsedID, parseErr := uuid.Parse(ID.(string))
+	if parseErr != nil {
+		return nil, &utils.AppError{
+			Message:    "Invalid token",
+			StatusCode: http.StatusUnauthorized,
+		}
+	}
+
+	userService := injector.InitializeUserService(config.DB)
+
+	userFound, err := userService.GetByID(parsedID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserLogged{
+		ID:        userFound.ID,
+		Username:  userFound.Username,
+		CompanyID: userFound.CompanyID,
+	}, nil
+}

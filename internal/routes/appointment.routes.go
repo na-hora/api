@@ -16,14 +16,15 @@ func AppointmentRoutes(r chi.Router) {
 
 	r.Route("/appointments", func(r chi.Router) {
 		// Not authenticated routes
-		r.Group(func(r chi.Router) {})
+		r.Group(func(r chi.Router) {
+			r.Get("/notifications", appointmentHandler.SseUpdates)
+			r.With(middlewares.ValidateStructBody(&dtos.CreateAppointmentsRequestBody{})).Post("/", appointmentHandler.Create)
+		})
 
 		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
-			r.With(middlewares.ValidateStructBody(&dtos.CreateAppointmentsRequestBody{})).Post("/", appointmentHandler.Create)
 			r.Get("/", appointmentHandler.List)
-			r.Get("/notifications", appointmentHandler.SseUpdates)
 		})
 	})
 }

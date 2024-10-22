@@ -43,7 +43,7 @@ func (m *authService) JwtAuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := parts[1]
 
-		_, claims, err := validateToken(tokenString)
+		_, claims, err := ValidateToken(tokenString)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("invalid token: %v", err), http.StatusUnauthorized)
 			return
@@ -59,7 +59,7 @@ func (m *authService) JwtAuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func validateToken(tokenString string) (*jwt.Token, jwt.MapClaims, error) {
+func ValidateToken(tokenString string) (*jwt.Token, jwt.MapClaims, error) {
 	jwtSecret := viper.Get("JWT_SECRET").(string)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

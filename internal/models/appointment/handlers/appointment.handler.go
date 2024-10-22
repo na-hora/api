@@ -145,12 +145,19 @@ func (ah *AppointmentHandler) SseUpdates(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
+	ctx := r.Context()
+
 	if f, ok := w.(http.Flusher); ok {
 		f.Flush()
 	}
 
-	ctx := r.Context()
-	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
+	stringToken := r.URL.Query().Get("token")
+
+	if stringToken == "" {
+		utils.ResponseJSON(w, http.StatusUnauthorized, "token is required")
+	}
+
+	userLogged, userErr := authentication.UserFromStringToken(stringToken)
 	if userErr != nil {
 		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
 		return
