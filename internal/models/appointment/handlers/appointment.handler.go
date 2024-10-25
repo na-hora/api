@@ -124,14 +124,12 @@ func (ah *AppointmentHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	for _, appointment := range appointments {
 		response.Appointments = append(response.Appointments, dtos.Appointment{
-			ID:                appointment.ID,
-			PetName:           appointment.PetName,
-			StartTime:         appointment.StartTime.Format("2006-01-02 15:04:05"),
-			TotalTime:         appointment.TotalTime,
-			TotalPrice:        appointment.TotalPrice,
-			PaymentMode:       appointment.PaymentMode,
-			Canceled:          appointment.Canceled,
-			CancelationReason: appointment.CancelationReason,
+			ID:          appointment.ID,
+			ServiceName: appointment.CompanyPetServiceValue.CompanyPetService.Name,
+			StartTime:   appointment.StartTime.Format("2006-01-02 15:04:05"),
+			TotalTime:   appointment.TotalTime,
+			TotalPrice:  appointment.TotalPrice,
+			Canceled:    appointment.Canceled,
 		})
 	}
 
