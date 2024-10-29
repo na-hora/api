@@ -42,8 +42,11 @@ func (as *AppointmentService) List(companyID uuid.UUID, startDate time.Time, end
 }
 
 func (as *AppointmentService) Create(companyID uuid.UUID, insert dtos.CreateAppointmentsRequestBody, tx *gorm.DB) (*entity.Appointment, *utils.AppError) {
-	companyPetServiceValue, appErr := as.petServiceRepo.GetConfigurationById(
-		insert.CompanyPetServiceValueID,
+	companyPetServiceValue, appErr := as.petServiceRepo.GetConfigurationBySizeAndHair(
+		insert.CompanyPetServiceID,
+		insert.CompanyPetSizeID,
+		insert.CompanyPetHairID,
+		tx,
 	)
 
 	if appErr != nil {
@@ -59,7 +62,7 @@ func (as *AppointmentService) Create(companyID uuid.UUID, insert dtos.CreateAppo
 
 	createParams := dtos.CreateAppointmentParams{
 		ClientID:                 insert.ClientID,
-		CompanyPetServiceValueID: insert.CompanyPetServiceValueID,
+		CompanyPetServiceValueID: companyPetServiceValue.ID,
 		StartTime:                insert.StartTime,
 		PetName:                  insert.PetName,
 		PaymentMode:              insert.PaymentMode,

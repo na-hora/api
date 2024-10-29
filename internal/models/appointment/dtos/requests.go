@@ -8,13 +8,15 @@ import (
 )
 
 type CreateAppointmentsRequestBody struct {
-	CompanyID                uuid.UUID `json:"companyId" validate:"required"`
-	ClientID                 uuid.UUID `json:"clientId" validate:"required"`
-	CompanyPetServiceValueID int       `json:"companyPetServiceValueId" validate:"required"`
-	StartTime                time.Time `json:"startTime" validate:"required"`
-	PetName                  string    `json:"petName"`
-	PaymentMode              string    `json:"paymentMode"`
-	Note                     string    `json:"note"`
+	CompanyID           uuid.UUID `json:"companyId" validate:"required"`
+	ClientID            uuid.UUID `json:"clientId" validate:"required"`
+	CompanyPetServiceID int       `json:"companyPetServiceId" validate:"required"`
+	CompanyPetSizeID    int       `json:"companyPetSizeId" validate:"required"`
+	CompanyPetHairID    int       `json:"companyPetHairId" validate:"required"`
+	StartTime           time.Time `json:"startTime" validate:"required"`
+	PetName             string    `json:"petName"`
+	PaymentMode         string    `json:"paymentMode"`
+	Note                string    `json:"note"`
 }
 
 func (dto *CreateAppointmentsRequestBody) Validate() error {

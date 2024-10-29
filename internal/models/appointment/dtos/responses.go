@@ -13,8 +13,9 @@ type ListAppointmentsResponse struct {
 type CreateAppointmentResponse struct {
 	ID uuid.UUID `json:"id"`
 
-	StartTime time.Time `json:"startTime"`
-	TotalTime int       `json:"totalTime"`
+	StartTime   time.Time `json:"startTime"`
+	TotalTime   int       `json:"totalTime"`
+	ServiceName string    `json:"serviceName"`
 }
 
 type Appointment struct {

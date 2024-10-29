@@ -7,7 +7,8 @@ import (
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
 	"na-hora/api/internal/models/appointment/dtos"
-	"na-hora/api/internal/models/appointment/services"
+	appointmentServices "na-hora/api/internal/models/appointment/services"
+	petServiceServices "na-hora/api/internal/models/pet-service/services"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
 	"na-hora/api/internal/utils/conversor"
@@ -24,13 +25,16 @@ type AppointmentHandlerInterface interface {
 }
 
 type AppointmentHandler struct {
-	appointmentService services.AppointmentServiceInterface
+	appointmentService appointmentServices.AppointmentServiceInterface
+	petServiceService  petServiceServices.PetServiceServiceInterface
 }
 
 func GetAppointmentHandler() AppointmentHandlerInterface {
 	appointmentService := injector.InitializeAppointmentService(config.DB)
+	petServiceService := injector.InitializePetServiceService(config.DB)
 	return &AppointmentHandler{
 		appointmentService,
+		petServiceService,
 	}
 }
 
@@ -56,10 +60,18 @@ func (ah *AppointmentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	companyPetService, petServiceErr := ah.petServiceService.GetByID(body.CompanyPetServiceID, nil)
+
+	if petServiceErr != nil {
+		utils.ResponseJSON(w, petServiceErr.StatusCode, petServiceErr.Message)
+		return
+	}
+
 	response := &dtos.CreateAppointmentResponse{
-		ID:        appointment.ID,
-		StartTime: appointment.StartTime,
-		TotalTime: appointment.TotalTime,
+		ID:          appointment.ID,
+		StartTime:   appointment.StartTime,
+		TotalTime:   appointment.TotalTime,
+		ServiceName: companyPetService.Name,
 	}
 
 	notificationErr := notifyClients(*response, body.CompanyID)
