@@ -11,10 +11,12 @@ type Client struct {
 	Name      string    `json:"name" gorm:"not null"`
 	Phone     string    `json:"phone" gorm:"not null"`
 	Email     string    `json:"email" gorm:"not null"`
+	CompanyID uuid.UUID `json:"companyId" gorm:"not null"`
 	CreatedAt time.Time `json:"createdAt" gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"default:CURRENT_TIMESTAMP"`
 
 	Appointments []Appointment `json:"appointments" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	Company      Company       `json:"company" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:CompanyID;references:ID;"`
 }
 
 func (Client) TableName() string {

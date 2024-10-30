@@ -13,6 +13,8 @@ import (
 	services11 "na-hora/api/internal/models/appointment/services"
 	repositories5 "na-hora/api/internal/models/city/repositories"
 	services5 "na-hora/api/internal/models/city/services"
+	repositories12 "na-hora/api/internal/models/client/repositories"
+	services12 "na-hora/api/internal/models/client/services"
 	repositories7 "na-hora/api/internal/models/company-hour-block/repositories"
 	services7 "na-hora/api/internal/models/company-hour-block/services"
 	repositories6 "na-hora/api/internal/models/company-hour/repositories"
@@ -102,6 +104,12 @@ func InitializeAppointmentService(db *gorm.DB) services11.AppointmentServiceInte
 	return appointmentServiceInterface
 }
 
+func InitializeClientService(db *gorm.DB) services12.ClientServiceInterface {
+	clientRepositoryInterface := repositories12.GetClientRepository(db)
+	clientServiceInterface := services12.GetClientService(clientRepositoryInterface)
+	return clientServiceInterface
+}
+
 // wire.go:
 
 var CompanyServiceSet = wire.NewSet(repositories.GetCompanyRepository, services.GetCompanyService)
@@ -125,3 +133,5 @@ var CompanyPetHairServiceSet = wire.NewSet(repositories9.GetCompanyPetHairReposi
 var CompanyPetSizeServiceSet = wire.NewSet(repositories10.GetCompanyPetSizeRepository, services10.GetCompanyPetSizeService)
 
 var AppointmentServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, repositories11.GetAppointmentRepository, services11.GetAppointmentService)
+
+var ClientServiceSet = wire.NewSet(repositories12.GetClientRepository, services12.GetClientService)
