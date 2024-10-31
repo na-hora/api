@@ -16,6 +16,14 @@ type CreateClientResponse struct {
 	CompanyID uuid.UUID `json:"companyId"`
 }
 
+type GetUniqueClientResponse struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Phone     string    `json:"phone"`
+	Email     string    `json:"email"`
+	CompanyID uuid.UUID `json:"companyId"`
+}
+
 type Client struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`

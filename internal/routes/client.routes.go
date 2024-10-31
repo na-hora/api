@@ -18,6 +18,7 @@ func ClientRoutes(r chi.Router) {
 		// Not authenticated routes
 		r.Group(func(r chi.Router) {
 			r.With(middlewares.ValidateStructBody(&dtos.CreateClientRequestBody{})).Post("/", clientHandler.Create)
+			r.Get("/by-email", clientHandler.GetByEmail)
 		})
 
 		// Authenticated routes

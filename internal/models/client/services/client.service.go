@@ -13,6 +13,7 @@ import (
 type ClientServiceInterface interface {
 	List(companyID uuid.UUID) ([]entity.Client, *utils.AppError)
 	Create(companyID uuid.UUID, insert dtos.CreateClientRequestBody, tx *gorm.DB) (*entity.Client, *utils.AppError)
+	GetByEmail(companyID uuid.UUID, email string) (*entity.Client, *utils.AppError)
 }
 
 type ClientService struct {
@@ -47,4 +48,14 @@ func (cs *ClientService) Create(companyID uuid.UUID, insert dtos.CreateClientReq
 	}
 
 	return clientCreated, nil
+}
+
+func (cs *ClientService) GetByEmail(companyID uuid.UUID, email string) (*entity.Client, *utils.AppError) {
+	client, err := cs.clientRepo.GetByEmail(companyID, email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }

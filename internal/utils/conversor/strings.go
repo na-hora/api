@@ -3,6 +3,8 @@ package conversor
 import (
 	"strconv"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type StringConversorInterface interface {
@@ -11,6 +13,7 @@ type StringConversorInterface interface {
 	ToDate(str string) (time.Time, error)
 	ToDateTime(str string) (time.Time, error)
 	ToDateTimeTZ(str string) (time.Time, error)
+	ToUUID(str string) (uuid.UUID, error)
 }
 
 type stringConversor struct{}
@@ -37,4 +40,8 @@ func (c *stringConversor) ToDateTime(str string) (time.Time, error) {
 
 func (c *stringConversor) ToDateTimeTZ(str string) (time.Time, error) {
 	return time.Parse("2006-01-02T15:04:05-07:00", str)
+}
+
+func (c *stringConversor) ToUUID(str string) (uuid.UUID, error) {
+	return uuid.Parse(str)
 }

@@ -13,6 +13,7 @@ import (
 type ClientRepositoryInterface interface {
 	List(companyID uuid.UUID) ([]entity.Client, *utils.AppError)
 	Create(companyID uuid.UUID, insert dtos.CreateClientRequestBody, tx *gorm.DB) (*entity.Client, *utils.AppError)
+	GetByEmail(companyID uuid.UUID, email string) (*entity.Client, *utils.AppError)
 }
 
 type ClientRepository struct {
@@ -59,6 +60,24 @@ func (cr *ClientRepository) Create(
 			Message:    data.Error.Error(),
 			StatusCode: http.StatusInternalServerError,
 		}
+	}
+
+	return &client, nil
+}
+
+func (cr *ClientRepository) GetByEmail(companyID uuid.UUID, email string) (*entity.Client, *utils.AppError) {
+	var client entity.Client
+
+	data := cr.db.Where("company_id = ? AND email = ?", companyID, email).First(&client)
+	if data.Error != nil {
+		if data.Error != gorm.ErrRecordNotFound {
+			return nil, &utils.AppError{
+				Message:    data.Error.Error(),
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+
+		return nil, nil
 	}
 
 	return &client, nil
