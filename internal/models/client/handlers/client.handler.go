@@ -15,6 +15,7 @@ type ClientHandlerInterface interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	List(w http.ResponseWriter, r *http.Request)
 	GetByEmail(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 }
 
 type ClientHandler struct {
@@ -125,6 +126,29 @@ func (ch *ClientHandler) GetByEmail(w http.ResponseWriter, r *http.Request) {
 		Phone:     client.Phone,
 		Email:     client.Email,
 		CompanyID: client.CompanyID,
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, response)
+}
+
+func (ch *ClientHandler) Update(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+	body := ctx.Value(utils.ValidatedBodyKey).(*dtos.UpdateClientRequestBody)
+
+	client, appErr := ch.clientService.Update(userLogged.CompanyID, *body, nil)
+
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	response := &dtos.UpdateClientResponse{
+		ID: client.ID,
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, response)

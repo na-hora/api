@@ -16,6 +16,10 @@ type CreateClientResponse struct {
 	CompanyID uuid.UUID `json:"companyId"`
 }
 
+type UpdateClientResponse struct {
+	ID uuid.UUID `json:"id"`
+}
+
 type GetUniqueClientResponse struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
