@@ -5,6 +5,7 @@ import (
 )
 
 type CreateCompanyPetSizeParams struct {
-	Name      string
-	CompanyID uuid.UUID
+	Name             string
+	CompanyID        uuid.UUID
+	CompanyPetTypeID int
 }

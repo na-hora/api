@@ -11,7 +11,7 @@ import (
 )
 
 type CompanyPetSizeServiceInterface interface {
-	CreateDefaultCompanyPetSizes(companyID uuid.UUID, tx *gorm.DB) *utils.AppError
+	Create(companyID uuid.UUID, petHairCreate dtos.CreateCompanyPetSizeRequestBody, tx *gorm.DB) *utils.AppError
 	ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetSize, *utils.AppError)
 }
 
@@ -25,19 +25,21 @@ func GetCompanyPetSizeService(repo repositories.CompanyPetSizeRepositoryInterfac
 	}
 }
 
-func (chs *CompanyPetSizeService) CreateDefaultCompanyPetSizes(companyID uuid.UUID, tx *gorm.DB) *utils.AppError {
-	var params = []dtos.CreateCompanyPetSizeParams{}
+func (cphs *CompanyPetSizeService) Create(
+	companyID uuid.UUID,
+	petSizeCreate dtos.CreateCompanyPetSizeRequestBody,
+	tx *gorm.DB,
+) *utils.AppError {
+	insertData := []dtos.CreateCompanyPetSizeParams{}
 
-	defaultSizes := []string{"Pequeno", "Médio", "Grande"}
+	insertData = append(insertData, dtos.CreateCompanyPetSizeParams{
+		Name:             petSizeCreate.Name,
+		CompanyID:        companyID,
+		CompanyPetTypeID: petSizeCreate.CompanyPetTypeID,
+	})
 
-	for _, sizeName := range defaultSizes {
-		params = append(params, dtos.CreateCompanyPetSizeParams{
-			CompanyID: companyID,
-			Name:      sizeName,
-		})
-	}
+	err := cphs.companyPetSizeRepository.CreateMany(insertData, tx)
 
-	err := chs.companyPetSizeRepository.CreateMany(params, tx)
 	if err != nil {
 		return err
 	}

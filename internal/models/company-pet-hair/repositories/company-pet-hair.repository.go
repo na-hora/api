@@ -33,8 +33,9 @@ func (chr *CompanyPetHairRepository) CreateMany(insert []dtos.CreateCompanyPetHa
 
 	for _, data := range insert {
 		treatedInserts = append(treatedInserts, entity.CompanyPetHair{
-			CompanyID: data.CompanyID,
-			Name:      data.Name,
+			CompanyID:        data.CompanyID,
+			Name:             data.Name,
+			CompanyPetTypeID: data.CompanyPetTypeID,
 		})
 
 		total = total + 1

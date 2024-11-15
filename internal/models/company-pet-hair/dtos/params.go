@@ -5,6 +5,7 @@ import (
 )
 
 type CreateCompanyPetHairParams struct {
-	Name      string
-	CompanyID uuid.UUID
+	Name             string
+	CompanyID        uuid.UUID
+	CompanyPetTypeID int
 }

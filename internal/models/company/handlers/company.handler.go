@@ -130,22 +130,6 @@ func (c *CompanyHandler) Register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	hairErr := c.companyPetHairService.CreateDefaultCompanyPetHairs(company.ID, tx)
-
-	if hairErr != nil {
-		tx.Rollback()
-		utils.ResponseJSON(w, hairErr.StatusCode, hairErr.Message)
-		return
-	}
-
-	sizeErr := c.companyPetSizeService.CreateDefaultCompanyPetSizes(company.ID, tx)
-
-	if sizeErr != nil {
-		tx.Rollback()
-		utils.ResponseJSON(w, sizeErr.StatusCode, sizeErr.Message)
-		return
-	}
-
 	tokenErr = c.tokenService.UseCompanyToken(validatorFound.Key, company.ID, tx)
 
 	response := &companyDTOs.CreateCompanyResponse{
