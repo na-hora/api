@@ -16,5 +16,6 @@ func VersionedRoutes(r chi.Router, version string) {
 		routes.PetServiceRoutes(r)
 		routes.AppointmentRoutes(r)
 		routes.ClientRoutes(r)
+		routes.PetTypeRoutes(r)
 	})
 }
