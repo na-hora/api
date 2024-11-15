@@ -6,6 +6,8 @@ import (
 	"na-hora/api/internal/utils"
 
 	"github.com/google/uuid"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -26,8 +28,11 @@ func GetCompanyPetTypeService(repo repositories.CompanyPetTypeRepositoryInterfac
 func (cpt *CompanyPetTypeService) CreatePetType(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError {
 	insertData := []dtos.CreateCompanyPetTypeParams{}
 
+	caser := cases.Title(language.BrazilianPortuguese)
+	nameTitled := caser.String(name)
+
 	insertData = append(insertData, dtos.CreateCompanyPetTypeParams{
-		Name:      name,
+		Name:      nameTitled,
 		CompanyID: companyID,
 	})
 

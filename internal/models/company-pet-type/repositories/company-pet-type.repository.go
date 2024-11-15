@@ -38,7 +38,7 @@ func (this *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetT
 		total = total + 1
 	}
 
-	data := tx.CreateInBatches(insert, total)
+	data := tx.CreateInBatches(treatedInserts, total)
 	if data.Error != nil {
 		return &utils.AppError{
 			Message:    data.Error.Error(),
