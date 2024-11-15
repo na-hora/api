@@ -1,6 +1,7 @@
 package services
 
 import (
+	"na-hora/api/internal/entity"
 	"na-hora/api/internal/models/company-pet-type/dtos"
 	"na-hora/api/internal/models/company-pet-type/repositories"
 	"na-hora/api/internal/utils"
@@ -13,6 +14,7 @@ import (
 
 type CompanyPetTypeServiceInterface interface {
 	CreatePetType(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError
+	GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
 }
 
 type CompanyPetTypeService struct {
@@ -42,5 +44,8 @@ func (cpt *CompanyPetTypeService) CreatePetType(companyID uuid.UUID, name string
 	}
 
 	return nil
+}
 
+func (cpt *CompanyPetTypeService) GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
+	return cpt.companyPetTypeRepository.List(companyID)
 }

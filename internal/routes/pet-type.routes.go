@@ -16,6 +16,7 @@ func PetTypeRoutes(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.Post("/", petTypeHandler.Register)
+			r.Get("/", petTypeHandler.GetByCompanyID)
 		})
 	})
 }

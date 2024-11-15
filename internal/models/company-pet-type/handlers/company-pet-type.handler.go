@@ -16,6 +16,7 @@ import (
 
 type CompanyPetTypeInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
+	GetByCompanyID(w http.ResponseWriter, r *http.Request)
 }
 
 type CompanyPetTypeHandler struct {
@@ -62,4 +63,29 @@ func (cpt *CompanyPetTypeHandler) Register(w http.ResponseWriter, r *http.Reques
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, nil)
+}
+
+func (cpt *CompanyPetTypeHandler) GetByCompanyID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	petTypes, appErr := cpt.companyPetTypeService.GetByCompanyID(userLogged.CompanyID)
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	var responsePetTypes = make([]dtos.ListPetTypesByCompanyResponse, 0)
+	for _, petType := range petTypes {
+		responsePetTypes = append(responsePetTypes, dtos.ListPetTypesByCompanyResponse{
+			ID:   petType.ID,
+			Name: petType.Name,
+		})
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, responsePetTypes)
 }

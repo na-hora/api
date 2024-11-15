@@ -6,11 +6,13 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type CompanyPetTypeRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetTypeParams, *gorm.DB) *utils.AppError
+	List(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
 }
 
 type CompanyPetTypeRepository struct {
@@ -21,9 +23,9 @@ func GetCompanyPetTypeRepository(db *gorm.DB) CompanyPetTypeRepositoryInterface 
 	return &CompanyPetTypeRepository{db}
 }
 
-func (this *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError {
+func (cpt *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError {
 	if tx == nil {
-		tx = this.db
+		tx = cpt.db
 	}
 
 	var treatedInserts []entity.CompanyPetType
@@ -47,4 +49,16 @@ func (this *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetT
 	}
 
 	return nil
+}
+
+func (cpt *CompanyPetTypeRepository) List(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
+	companyPetTypes := []entity.CompanyPetType{}
+	data := cpt.db.Where("company_id = ?", companyID).Find(&companyPetTypes)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return companyPetTypes, nil
 }
