@@ -14,6 +14,7 @@ type CompanyPetTypeRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetTypeParams, *gorm.DB) *utils.AppError
 	List(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
 	DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError
+	UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetTypeRepository struct {
@@ -70,6 +71,34 @@ func (cpt *CompanyPetTypeRepository) DeleteByID(petTypeID int, tx *gorm.DB) *uti
 	}
 
 	data := tx.Where("id = ?", petTypeID).Delete(&entity.CompanyPetType{})
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	if data.RowsAffected == 0 {
+		return &utils.AppError{
+			Message:    "Pet type not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	return nil
+}
+
+func (cpt *CompanyPetTypeRepository) UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = cpt.db
+	}
+
+	companyPetType := entity.CompanyPetType{
+		ID:   petTypeID,
+		Name: update.Name,
+	}
+
+	data := tx.Updates(&companyPetType)
 	if data.Error != nil {
 		return &utils.AppError{
 			Message:    data.Error.Error(),

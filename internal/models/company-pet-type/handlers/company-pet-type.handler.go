@@ -20,6 +20,7 @@ type CompanyPetTypeInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 	GetByCompanyID(w http.ResponseWriter, r *http.Request)
 	DeleteByID(w http.ResponseWriter, r *http.Request)
+	UpdateByID(w http.ResponseWriter, r *http.Request)
 }
 
 type CompanyPetTypeHandler struct {
@@ -103,6 +104,32 @@ func (cpt *CompanyPetTypeHandler) DeleteByID(w http.ResponseWriter, r *http.Requ
 	}
 
 	appErr := cpt.companyPetTypeService.DeleteByID(parsedPetTypeId, nil)
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, nil)
+}
+
+func (cpt *CompanyPetTypeHandler) UpdateByID(w http.ResponseWriter, r *http.Request) {
+	petTypeId := chi.URLParam(r, "ID")
+
+	parsedPetTypeId, err := strconv.Atoi(petTypeId)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var body dtos.CreateCompanyPetTypeParams
+
+	err = json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	appErr := cpt.companyPetTypeService.UpdateByID(parsedPetTypeId, body, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return

@@ -16,6 +16,7 @@ type CompanyPetTypeServiceInterface interface {
 	CreatePetType(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError
 	GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
 	DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError
+	UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetTypeService struct {
@@ -53,4 +54,13 @@ func (cpt *CompanyPetTypeService) GetByCompanyID(companyID uuid.UUID) ([]entity.
 
 func (cpt *CompanyPetTypeService) DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError {
 	return cpt.companyPetTypeRepository.DeleteByID(petTypeID, tx)
+}
+
+func (cpt *CompanyPetTypeService) UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError {
+	caser := cases.Title(language.BrazilianPortuguese)
+	nameTitled := caser.String(update.Name)
+
+	update.Name = nameTitled
+
+	return cpt.companyPetTypeRepository.UpdateByID(petTypeID, update, tx)
 }
