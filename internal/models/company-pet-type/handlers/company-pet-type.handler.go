@@ -10,13 +10,16 @@ import (
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/go-playground/validator/v10"
 )
 
 type CompanyPetTypeInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
 	GetByCompanyID(w http.ResponseWriter, r *http.Request)
+	DeleteByID(w http.ResponseWriter, r *http.Request)
 }
 
 type CompanyPetTypeHandler struct {
@@ -88,4 +91,22 @@ func (cpt *CompanyPetTypeHandler) GetByCompanyID(w http.ResponseWriter, r *http.
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, responsePetTypes)
+}
+
+func (cpt *CompanyPetTypeHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {
+	petTypeId := chi.URLParam(r, "ID")
+
+	parsedPetTypeId, err := strconv.Atoi(petTypeId)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	appErr := cpt.companyPetTypeService.DeleteByID(parsedPetTypeId, nil)
+	if appErr != nil {
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, nil)
 }

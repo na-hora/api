@@ -15,6 +15,7 @@ import (
 type CompanyPetTypeServiceInterface interface {
 	CreatePetType(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError
 	GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
+	DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetTypeService struct {
@@ -48,4 +49,8 @@ func (cpt *CompanyPetTypeService) CreatePetType(companyID uuid.UUID, name string
 
 func (cpt *CompanyPetTypeService) GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
 	return cpt.companyPetTypeRepository.List(companyID)
+}
+
+func (cpt *CompanyPetTypeService) DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError {
+	return cpt.companyPetTypeRepository.DeleteByID(petTypeID, tx)
 }
