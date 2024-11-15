@@ -11,7 +11,7 @@ import (
 )
 
 type CompanyPetHairServiceInterface interface {
-	CreateDefaultCompanyPetHairs(companyID uuid.UUID, tx *gorm.DB) *utils.AppError
+	Create(companyID uuid.UUID, petHairCreate dtos.CreateCompanyPetHairRequestBody, tx *gorm.DB) *utils.AppError
 	ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
 }
 
@@ -25,19 +25,21 @@ func GetCompanyPetHairService(repo repositories.CompanyPetHairRepositoryInterfac
 	}
 }
 
-func (chs *CompanyPetHairService) CreateDefaultCompanyPetHairs(companyID uuid.UUID, tx *gorm.DB) *utils.AppError {
-	var params = []dtos.CreateCompanyPetHairParams{}
+func (cphs *CompanyPetHairService) Create(
+	companyID uuid.UUID,
+	petHairCreate dtos.CreateCompanyPetHairRequestBody,
+	tx *gorm.DB,
+) *utils.AppError {
+	insertData := []dtos.CreateCompanyPetHairParams{}
 
-	defaultHairs := []string{"Curto", "Médio", "Longo"}
+	insertData = append(insertData, dtos.CreateCompanyPetHairParams{
+		Name:             petHairCreate.Name,
+		CompanyID:        companyID,
+		CompanyPetTypeID: petHairCreate.CompanyPetTypeID,
+	})
 
-	for _, hairName := range defaultHairs {
-		params = append(params, dtos.CreateCompanyPetHairParams{
-			CompanyID: companyID,
-			Name:      hairName,
-		})
-	}
+	err := cphs.companyPetHairRepository.CreateMany(insertData, tx)
 
-	err := chs.companyPetHairRepository.CreateMany(params, tx)
 	if err != nil {
 		return err
 	}
@@ -45,8 +47,8 @@ func (chs *CompanyPetHairService) CreateDefaultCompanyPetHairs(companyID uuid.UU
 	return nil
 }
 
-func (chs *CompanyPetHairService) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
-	hairs, err := chs.companyPetHairRepository.ListByCompanyID(companyID, tx)
+func (cphs *CompanyPetHairService) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
+	hairs, err := cphs.companyPetHairRepository.ListByCompanyID(companyID, tx)
 	if err != nil {
 		return nil, err
 	}
