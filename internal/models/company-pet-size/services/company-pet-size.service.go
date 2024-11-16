@@ -14,7 +14,7 @@ type CompanyPetSizeServiceInterface interface {
 	Create(companyID uuid.UUID, petHairCreate dtos.CreateCompanyPetSizeRequestBody, tx *gorm.DB) *utils.AppError
 	ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetSize, *utils.AppError)
 	DeleteByID(petSizeID int, tx *gorm.DB) *utils.AppError
-	UpdateByID(petSizeID int, update dtos.CreateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError
+	UpdateByID(petSizeID int, update dtos.UpdateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetSizeService struct {
@@ -57,6 +57,6 @@ func (chs *CompanyPetSizeService) DeleteByID(petSizeID int, tx *gorm.DB) *utils.
 	return chs.companyPetSizeRepository.DeleteByID(petSizeID, tx)
 }
 
-func (cpt *CompanyPetSizeService) UpdateByID(petSizeID int, update dtos.CreateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError {
+func (cpt *CompanyPetSizeService) UpdateByID(petSizeID int, update dtos.UpdateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError {
 	return cpt.companyPetSizeRepository.UpdateByID(petSizeID, update, tx)
 }

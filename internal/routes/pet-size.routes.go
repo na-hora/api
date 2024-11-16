@@ -23,7 +23,7 @@ func PetSizeRoutes(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.With(middlewares.ValidateStructBody(&dtos.CreateCompanyPetSizeRequestBody{})).Post("/", petSizeHandler.Create)
-			r.Put("/{ID}", petSizeHandler.UpdateByID)
+			r.With(middlewares.ValidateStructBody(&dtos.UpdateCompanyPetSizeRequestBody{})).Put("/{ID}", petSizeHandler.UpdateByID)
 			r.Delete("/{ID}", petSizeHandler.DeleteByID)
 		})
 	})

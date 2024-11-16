@@ -14,7 +14,7 @@ type CompanyPetSizeRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetSizeParams, *gorm.DB) *utils.AppError
 	ListByCompanyID(uuid.UUID, *gorm.DB) ([]entity.CompanyPetSize, *utils.AppError)
 	DeleteByID(petSizeID int, tx *gorm.DB) *utils.AppError
-	UpdateByID(petSizeID int, update dtos.CreateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError
+	UpdateByID(petSizeID int, update dtos.UpdateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetSizeRepository struct {
@@ -94,15 +94,14 @@ func (cpt *CompanyPetSizeRepository) DeleteByID(petSizeID int, tx *gorm.DB) *uti
 	return nil
 }
 
-func (cpt *CompanyPetSizeRepository) UpdateByID(petSizeID int, update dtos.CreateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError {
+func (cpt *CompanyPetSizeRepository) UpdateByID(petSizeID int, update dtos.UpdateCompanyPetSizeParams, tx *gorm.DB) *utils.AppError {
 	if tx == nil {
 		tx = cpt.db
 	}
 
 	companyPetSize := entity.CompanyPetSize{
-		ID:               petSizeID,
-		Name:             update.Name,
-		CompanyPetTypeID: update.CompanyPetTypeID,
+		ID:   petSizeID,
+		Name: update.Name,
 	}
 
 	data := tx.Updates(&companyPetSize)

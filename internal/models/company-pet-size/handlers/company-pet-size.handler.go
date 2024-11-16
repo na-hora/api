@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
 	"na-hora/api/internal/models/company-pet-size/dtos"
@@ -115,15 +114,12 @@ func (cpt *CompanyPetSizeHandler) UpdateByID(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var body dtos.CreateCompanyPetSizeParams
+	ctx := r.Context()
+	body := ctx.Value(utils.ValidatedBodyKey).(*dtos.UpdateCompanyPetSizeRequestBody)
 
-	err = json.NewDecoder(r.Body).Decode(&body)
-	if err != nil {
-		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	appErr := cpt.companyPetSizeService.UpdateByID(parsedPetSizeId, body, nil)
+	appErr := cpt.companyPetSizeService.UpdateByID(parsedPetSizeId, dtos.UpdateCompanyPetSizeParams{
+		Name: body.Name,
+	}, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
