@@ -1,5 +1,7 @@
 package dtos
 
-// type CreateCompanyPetHairResponse struct {
-// 	ID int `json:"id"`
-// }
+type ListPetHairsByCompanyResponse struct {
+	ID               int    `json:"id"`
+	Name             string `json:"name"`
+	CompanyPetTypeID int    `json:"companyPetTypeId"`
+}

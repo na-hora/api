@@ -13,6 +13,8 @@ import (
 type CompanyPetHairServiceInterface interface {
 	Create(companyID uuid.UUID, petHairCreate dtos.CreateCompanyPetHairRequestBody, tx *gorm.DB) *utils.AppError
 	ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
+	DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError
+	UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetHairService struct {
@@ -47,11 +49,14 @@ func (cphs *CompanyPetHairService) Create(
 	return nil
 }
 
-func (cphs *CompanyPetHairService) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
-	hairs, err := cphs.companyPetHairRepository.ListByCompanyID(companyID, tx)
-	if err != nil {
-		return nil, err
-	}
+func (chs *CompanyPetHairService) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
+	return chs.companyPetHairRepository.ListByCompanyID(companyID, tx)
+}
 
-	return hairs, nil
+func (chs *CompanyPetHairService) DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError {
+	return chs.companyPetHairRepository.DeleteByID(petHairID, tx)
+}
+
+func (cpt *CompanyPetHairService) UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError {
+	return cpt.companyPetHairRepository.UpdateByID(petHairID, update, tx)
 }

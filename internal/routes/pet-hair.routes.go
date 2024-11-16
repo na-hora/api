@@ -15,12 +15,16 @@ func PetHairRoutes(r chi.Router) {
 
 	r.Route("/pet-hair", func(r chi.Router) {
 		// Not authenticated routes
-		r.Group(func(r chi.Router) {})
+		r.Group(func(r chi.Router) {
+			r.Get("/", petHairHandler.GetByCompanyID)
+		})
 
 		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.With(middlewares.ValidateStructBody(&dtos.CreateCompanyPetHairRequestBody{})).Post("/", petHairHandler.Create)
+			r.With(middlewares.ValidateStructBody(&dtos.UpdateCompanyPetHairRequestBody{})).Put("/{ID}", petHairHandler.UpdateByID)
+			r.Delete("/{ID}", petHairHandler.DeleteByID)
 		})
 	})
 }

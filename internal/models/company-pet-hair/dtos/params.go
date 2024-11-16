@@ -9,3 +9,7 @@ type CreateCompanyPetHairParams struct {
 	CompanyID        uuid.UUID
 	CompanyPetTypeID int
 }
+
+type UpdateCompanyPetHairParams struct {
+	Name string
+}

@@ -13,6 +13,8 @@ import (
 type CompanyPetHairRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetHairParams, *gorm.DB) *utils.AppError
 	ListByCompanyID(uuid.UUID, *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
+	DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError
+	UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError
 }
 
 type CompanyPetHairRepository struct {
@@ -67,4 +69,55 @@ func (chr *CompanyPetHairRepository) ListByCompanyID(companyID uuid.UUID, tx *go
 	}
 
 	return companyPetHairs, nil
+}
+
+func (cpt *CompanyPetHairRepository) DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = cpt.db
+	}
+
+	data := tx.Where("id = ?", petHairID).Delete(&entity.CompanyPetHair{})
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	if data.RowsAffected == 0 {
+		return &utils.AppError{
+			Message:    "Pet hair not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	return nil
+}
+
+func (cpt *CompanyPetHairRepository) UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = cpt.db
+	}
+
+	companyPetHair := entity.CompanyPetHair{
+		ID:   petHairID,
+		Name: update.Name,
+	}
+
+	data := tx.Updates(&companyPetHair)
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	if data.RowsAffected == 0 {
+		return &utils.AppError{
+			Message:    "Pet hair not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	return nil
 }
