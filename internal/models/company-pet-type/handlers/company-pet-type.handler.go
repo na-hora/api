@@ -9,6 +9,7 @@ import (
 	tokenServices "na-hora/api/internal/models/token/services"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
+	"na-hora/api/internal/utils/conversor"
 	"net/http"
 	"strconv"
 
@@ -56,14 +57,22 @@ func (cpt *CompanyPetTypeHandler) Register(w http.ResponseWriter, r *http.Reques
 }
 
 func (cpt *CompanyPetTypeHandler) GetByCompanyID(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
-	if userErr != nil {
-		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+	companyID := r.URL.Query().Get("companyId")
+
+	if companyID == "" {
+		utils.ResponseJSON(w, http.StatusBadRequest, "companyId is required")
 		return
 	}
 
-	petTypes, appErr := cpt.companyPetTypeService.GetByCompanyID(userLogged.CompanyID)
+	strConv := conversor.GetStringConversor()
+	companyIdConverted, err := strConv.ToUUID(companyID)
+
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	petTypes, appErr := cpt.companyPetTypeService.GetByCompanyID(companyIdConverted)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
