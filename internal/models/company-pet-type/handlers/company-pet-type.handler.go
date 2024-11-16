@@ -61,7 +61,7 @@ func (cpt *CompanyPetTypeHandler) Register(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	appErr := cpt.companyPetTypeService.CreatePetType(userLogged.CompanyID, petTypePayload.Name, nil)
+	appErr := cpt.companyPetTypeService.Create(userLogged.CompanyID, petTypePayload.Name, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 	}

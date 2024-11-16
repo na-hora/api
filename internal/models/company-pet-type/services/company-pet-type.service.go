@@ -13,7 +13,7 @@ import (
 )
 
 type CompanyPetTypeServiceInterface interface {
-	CreatePetType(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError
+	Create(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError
 	GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
 	DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError
 	UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError
@@ -29,7 +29,7 @@ func GetCompanyPetTypeService(repo repositories.CompanyPetTypeRepositoryInterfac
 	}
 }
 
-func (cpt *CompanyPetTypeService) CreatePetType(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError {
+func (cpt *CompanyPetTypeService) Create(companyID uuid.UUID, name string, tx *gorm.DB) *utils.AppError {
 	insertData := []dtos.CreateCompanyPetTypeParams{}
 
 	caser := cases.Title(language.BrazilianPortuguese)
