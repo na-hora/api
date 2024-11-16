@@ -4,7 +4,6 @@ import (
 	"na-hora/api/internal/models/company-pet-hair/dtos"
 	"na-hora/api/internal/models/company-pet-hair/handlers"
 	"na-hora/api/internal/routes/middlewares"
-	authentication "na-hora/api/internal/routes/middlewares"
 
 	"github.com/go-chi/chi"
 )
@@ -12,7 +11,7 @@ import (
 func PetHairRoutes(r chi.Router) {
 	petHairHandler := handlers.GetCompanyPetHairHandler()
 
-	authService := authentication.NewAuthService()
+	authService := middlewares.NewAuthService()
 
 	r.Route("/pet-hair", func(r chi.Router) {
 		// Not authenticated routes

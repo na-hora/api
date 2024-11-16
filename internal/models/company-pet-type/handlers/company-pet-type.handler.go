@@ -6,7 +6,6 @@ import (
 	"na-hora/api/internal/injector"
 	"na-hora/api/internal/models/company-pet-type/dtos"
 	companyPetTypeServices "na-hora/api/internal/models/company-pet-type/services"
-	tokenServices "na-hora/api/internal/models/token/services"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
 	"na-hora/api/internal/utils/conversor"
@@ -25,16 +24,13 @@ type CompanyPetTypeInterface interface {
 
 type CompanyPetTypeHandler struct {
 	companyPetTypeService companyPetTypeServices.CompanyPetTypeServiceInterface
-	tokenService          tokenServices.TokenServiceInterface
 }
 
 func GetCompanyPetTypeHandler() CompanyPetTypeInterface {
 	companyPetTypeService := injector.InitializeCompanyPetTypeService(config.DB)
-	tokenService := injector.InitializeTokenService(config.DB)
 
 	return &CompanyPetTypeHandler{
 		companyPetTypeService,
-		tokenService,
 	}
 }
 
