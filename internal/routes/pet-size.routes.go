@@ -4,7 +4,6 @@ import (
 	"na-hora/api/internal/models/company-pet-size/dtos"
 	"na-hora/api/internal/models/company-pet-size/handlers"
 	"na-hora/api/internal/routes/middlewares"
-	authentication "na-hora/api/internal/routes/middlewares"
 
 	"github.com/go-chi/chi"
 )
@@ -12,7 +11,7 @@ import (
 func PetSizeRoutes(r chi.Router) {
 	petSizeHandler := handlers.GetCompanyPetSizeHandler()
 
-	authService := authentication.NewAuthService()
+	authService := middlewares.NewAuthService()
 
 	r.Route("/pet-size", func(r chi.Router) {
 		// Not authenticated routes

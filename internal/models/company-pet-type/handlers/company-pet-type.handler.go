@@ -13,7 +13,6 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
-	"github.com/go-playground/validator/v10"
 )
 
 type CompanyPetTypeInterface interface {
@@ -39,23 +38,10 @@ func GetCompanyPetTypeHandler() CompanyPetTypeInterface {
 }
 
 func (cpt *CompanyPetTypeHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var petTypePayload dtos.CreatePetTypeRequestBody
-
-	err := json.NewDecoder(r.Body).Decode(&petTypePayload)
-	if err != nil {
-		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err = validate.Struct(petTypePayload)
-	if err != nil {
-		utils.ResponseValidationErrors(err, w, "body")
-		return
-	}
-
 	ctx := r.Context()
 	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
+
+	petTypePayload := ctx.Value(utils.ValidatedBodyKey).(*dtos.CreatePetTypeRequestBody)
 	if userErr != nil {
 		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
 		return
