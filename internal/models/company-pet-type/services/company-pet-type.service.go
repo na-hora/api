@@ -49,7 +49,7 @@ func (cpt *CompanyPetTypeService) Create(companyID uuid.UUID, name string, tx *g
 }
 
 func (cpt *CompanyPetTypeService) GetByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
-	return cpt.companyPetTypeRepository.List(companyID)
+	return cpt.companyPetTypeRepository.ListByCompanyID(companyID)
 }
 
 func (cpt *CompanyPetTypeService) DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError {

@@ -12,7 +12,7 @@ import (
 
 type CompanyPetTypeRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetTypeParams, *gorm.DB) *utils.AppError
-	List(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
+	ListByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
 	DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError
 	UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError
 }
@@ -53,7 +53,7 @@ func (cpt *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetTy
 	return nil
 }
 
-func (cpt *CompanyPetTypeRepository) List(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
+func (cpt *CompanyPetTypeRepository) ListByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
 	companyPetTypes := []entity.CompanyPetType{}
 	data := cpt.db.Where("company_id = ?", companyID).Find(&companyPetTypes)
 	if data.Error != nil {
