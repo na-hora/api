@@ -60,7 +60,8 @@ func (chr *CompanyPetSizeRepository) ListByCompanyID(companyID uuid.UUID, tx *go
 	}
 
 	var companyPetSizes []entity.CompanyPetSize
-	data := tx.Where("company_id = ?", companyID).Find(&companyPetSizes)
+	data := tx.Where("company_id = ?", companyID).Preload("CompanyPetType").Find(&companyPetSizes)
+
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
