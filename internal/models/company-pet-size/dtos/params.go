@@ -6,10 +6,12 @@ import (
 
 type CreateCompanyPetSizeParams struct {
 	Name             string
+	Description      *string
 	CompanyID        uuid.UUID
 	CompanyPetTypeID int
 }
 
 type UpdateCompanyPetSizeParams struct {
-	Name string
+	Name        string
+	Description *string
 }

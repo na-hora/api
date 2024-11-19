@@ -119,7 +119,8 @@ func (cpt *CompanyPetHairHandler) UpdateByID(w http.ResponseWriter, r *http.Requ
 	body := ctx.Value(utils.ValidatedBodyKey).(*dtos.UpdateCompanyPetHairRequestBody)
 
 	appErr := cpt.companyPetHairService.UpdateByID(parsedPetHairId, dtos.UpdateCompanyPetHairParams{
-		Name: body.Name,
+		Name:        body.Name,
+		Description: body.Description,
 	}, nil)
 
 	if appErr != nil {

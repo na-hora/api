@@ -3,8 +3,9 @@ package dtos
 import "github.com/go-playground/validator/v10"
 
 type CreateCompanyPetHairRequestBody struct {
-	Name             string `json:"name" validate:"required"`
-	CompanyPetTypeID int    `json:"companyPetTypeID" validate:"required"`
+	Name             string  `json:"name" validate:"required"`
+	Description      *string `json:"description"`
+	CompanyPetTypeID int     `json:"companyPetTypeID" validate:"required"`
 }
 
 func (dto *CreateCompanyPetHairRequestBody) Validate() error {
@@ -13,7 +14,8 @@ func (dto *CreateCompanyPetHairRequestBody) Validate() error {
 }
 
 type UpdateCompanyPetHairRequestBody struct {
-	Name string `json:"name" validate:"required"`
+	Name        string  `json:"name" validate:"required"`
+	Description *string `json:"description"`
 }
 
 func (dto *UpdateCompanyPetHairRequestBody) Validate() error {

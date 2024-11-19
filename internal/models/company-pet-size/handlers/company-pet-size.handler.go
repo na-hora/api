@@ -119,7 +119,8 @@ func (cpt *CompanyPetSizeHandler) UpdateByID(w http.ResponseWriter, r *http.Requ
 	body := ctx.Value(utils.ValidatedBodyKey).(*dtos.UpdateCompanyPetSizeRequestBody)
 
 	appErr := cpt.companyPetSizeService.UpdateByID(parsedPetSizeId, dtos.UpdateCompanyPetSizeParams{
-		Name: body.Name,
+		Name:        body.Name,
+		Description: body.Description,
 	}, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)

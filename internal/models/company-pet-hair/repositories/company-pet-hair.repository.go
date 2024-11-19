@@ -37,6 +37,7 @@ func (chr *CompanyPetHairRepository) CreateMany(insert []dtos.CreateCompanyPetHa
 		treatedInserts = append(treatedInserts, entity.CompanyPetHair{
 			CompanyID:        data.CompanyID,
 			Name:             data.Name,
+			Description:      data.Description,
 			CompanyPetTypeID: data.CompanyPetTypeID,
 		})
 
@@ -100,8 +101,9 @@ func (cpt *CompanyPetHairRepository) UpdateByID(petHairID int, update dtos.Updat
 	}
 
 	companyPetHair := entity.CompanyPetHair{
-		ID:   petHairID,
-		Name: update.Name,
+		ID:          petHairID,
+		Name:        update.Name,
+		Description: update.Description,
 	}
 
 	data := tx.Updates(&companyPetHair)

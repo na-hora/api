@@ -36,6 +36,7 @@ func (cphs *CompanyPetSizeService) Create(
 
 	insertData = append(insertData, dtos.CreateCompanyPetSizeParams{
 		Name:             petSizeCreate.Name,
+		Description:      petSizeCreate.Description,
 		CompanyID:        companyID,
 		CompanyPetTypeID: petSizeCreate.CompanyPetTypeID,
 	})
