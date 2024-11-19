@@ -80,6 +80,7 @@ func (cpt *CompanyPetHairHandler) GetByCompanyID(w http.ResponseWriter, r *http.
 		responsePetHairs = append(responsePetHairs, dtos.ListPetHairsByCompanyResponse{
 			ID:                 petHair.ID,
 			Name:               petHair.Name,
+			Description:        petHair.Description,
 			CompanyPetTypeID:   petHair.CompanyPetTypeID,
 			CompanyPetTypeName: petHair.CompanyPetType.Name,
 		})
