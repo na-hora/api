@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
+	companyPetHairServices "na-hora/api/internal/models/company-pet-hair/services"
+	companyPetSizeServices "na-hora/api/internal/models/company-pet-size/services"
 	"na-hora/api/internal/models/company-pet-type/dtos"
 	companyPetTypeServices "na-hora/api/internal/models/company-pet-type/services"
 	"na-hora/api/internal/utils"
@@ -20,29 +22,36 @@ type CompanyPetTypeInterface interface {
 	GetByCompanyID(w http.ResponseWriter, r *http.Request)
 	DeleteByID(w http.ResponseWriter, r *http.Request)
 	UpdateByID(w http.ResponseWriter, r *http.Request)
+	GetValuesCombinations(w http.ResponseWriter, r *http.Request)
 }
 
 type CompanyPetTypeHandler struct {
-	companyPetTypeService companyPetTypeServices.CompanyPetTypeServiceInterface
+	companyPetTypeService  companyPetTypeServices.CompanyPetTypeServiceInterface
+	companyPetHairService  companyPetHairServices.CompanyPetHairServiceInterface
+	companyPetSizeServices companyPetSizeServices.CompanyPetSizeServiceInterface
 }
 
 func GetCompanyPetTypeHandler() CompanyPetTypeInterface {
 	companyPetTypeService := injector.InitializeCompanyPetTypeService(config.DB)
+	companyPetHairService := injector.InitializeCompanyPetHairService(config.DB)
+	companyPetSizeServices := injector.InitializeCompanyPetSizeService(config.DB)
 
 	return &CompanyPetTypeHandler{
 		companyPetTypeService,
+		companyPetHairService,
+		companyPetSizeServices,
 	}
 }
 
 func (cpt *CompanyPetTypeHandler) Register(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userLogged, userErr := authentication.JwtUserOrThrow(ctx)
-
-	petTypePayload := ctx.Value(utils.ValidatedBodyKey).(*dtos.CreatePetTypeRequestBody)
 	if userErr != nil {
 		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
 		return
 	}
+
+	petTypePayload := ctx.Value(utils.ValidatedBodyKey).(*dtos.CreatePetTypeRequestBody)
 
 	appErr := cpt.companyPetTypeService.Create(userLogged.CompanyID, petTypePayload.Name, nil)
 	if appErr != nil {
@@ -83,6 +92,40 @@ func (cpt *CompanyPetTypeHandler) GetByCompanyID(w http.ResponseWriter, r *http.
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, responsePetTypes)
+}
+
+func (cpt *CompanyPetTypeHandler) GetValuesCombinations(w http.ResponseWriter, r *http.Request) {
+	petTypeId := chi.URLParam(r, "ID")
+
+	parsedPetTypeId, err := strconv.Atoi(petTypeId)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	sizes, sizesErr := cpt.companyPetSizeServices.ListByPetTypeID(parsedPetTypeId, nil)
+	if sizesErr != nil {
+		utils.ResponseJSON(w, sizesErr.StatusCode, sizesErr.Message)
+		return
+	}
+
+	hairs, hairsErr := cpt.companyPetHairService.ListByPetTypeID(parsedPetTypeId, nil)
+	if hairsErr != nil {
+		utils.ResponseJSON(w, hairsErr.StatusCode, hairsErr.Message)
+		return
+	}
+
+	var responseCombinations = make([]dtos.ListPetTypeCombinationsResponse, 0)
+	for _, size := range sizes {
+		for _, hair := range hairs {
+			responseCombinations = append(responseCombinations, dtos.ListPetTypeCombinationsResponse{
+				Hair: dtos.PetTypeCombinationsHair{ID: hair.ID, Name: hair.Name},
+				Size: dtos.PetTypeCombinationsSize{ID: size.ID, Name: size.Name},
+			})
+		}
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, responseCombinations)
 }
 
 func (cpt *CompanyPetTypeHandler) DeleteByID(w http.ResponseWriter, r *http.Request) {

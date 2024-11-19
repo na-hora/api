@@ -23,6 +23,7 @@ func PetTypeRoutes(r chi.Router) {
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.With(middlewares.ValidateStructBody(&dtos.CreatePetTypeRequestBody{})).Post("/", petTypeHandler.Register)
+			r.Get("/{ID}/combinations", petTypeHandler.GetValuesCombinations)
 			r.Put("/{ID}", petTypeHandler.UpdateByID)
 			r.Delete("/{ID}", petTypeHandler.DeleteByID)
 		})

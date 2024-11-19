@@ -13,6 +13,7 @@ import (
 type CompanyPetHairServiceInterface interface {
 	Create(companyID uuid.UUID, petHairCreate dtos.CreateCompanyPetHairRequestBody, tx *gorm.DB) *utils.AppError
 	ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
+	ListByPetTypeID(petTypeID int, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
 	DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError
 	UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError
 }
@@ -52,6 +53,10 @@ func (cphs *CompanyPetHairService) Create(
 
 func (chs *CompanyPetHairService) ListByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
 	return chs.companyPetHairRepository.ListByCompanyID(companyID, tx)
+}
+
+func (chs *CompanyPetHairService) ListByPetTypeID(petTypeID int, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
+	return chs.companyPetHairRepository.ListByPetTypeID(petTypeID, tx)
 }
 
 func (chs *CompanyPetHairService) DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError {

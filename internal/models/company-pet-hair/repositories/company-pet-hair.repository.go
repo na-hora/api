@@ -13,6 +13,7 @@ import (
 type CompanyPetHairRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetHairParams, *gorm.DB) *utils.AppError
 	ListByCompanyID(uuid.UUID, *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
+	ListByPetTypeID(int, *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError)
 	DeleteByID(petHairID int, tx *gorm.DB) *utils.AppError
 	UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError
 }
@@ -62,6 +63,23 @@ func (chr *CompanyPetHairRepository) ListByCompanyID(companyID uuid.UUID, tx *go
 
 	var companyPetHairs []entity.CompanyPetHair
 	data := tx.Where("company_id = ?", companyID).Preload("CompanyPetType").Find(&companyPetHairs)
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return companyPetHairs, nil
+}
+
+func (chr *CompanyPetHairRepository) ListByPetTypeID(petTypeID int, tx *gorm.DB) ([]entity.CompanyPetHair, *utils.AppError) {
+	if tx == nil {
+		tx = chr.db
+	}
+
+	var companyPetHairs []entity.CompanyPetHair
+	data := tx.Where("company_pet_type_id = ?", petTypeID).Preload("CompanyPetType").Find(&companyPetHairs)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
