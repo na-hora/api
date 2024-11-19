@@ -90,14 +90,22 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
-	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
+	companyID := r.URL.Query().Get("companyId")
 
-	if userErr != nil {
-		utils.ResponseJSON(w, http.StatusUnauthorized, userErr)
+	if companyID == "" {
+		utils.ResponseJSON(w, http.StatusBadRequest, "companyId is required")
 		return
 	}
 
-	petServices, appErr := ph.petServiceService.GetByCompanyID(userLogged.CompanyID, nil)
+	strConv := conversor.GetStringConversor()
+	companyIdConverted, err := strConv.ToUUID(companyID)
+
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	petServices, appErr := ph.petServiceService.GetByCompanyID(companyIdConverted, nil)
 	if appErr != nil {
 		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
 		return
