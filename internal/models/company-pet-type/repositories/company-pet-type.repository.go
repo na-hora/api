@@ -55,7 +55,7 @@ func (cpt *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetTy
 
 func (cpt *CompanyPetTypeRepository) ListByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {
 	companyPetTypes := []entity.CompanyPetType{}
-	data := cpt.db.Where("company_id = ?", companyID).Find(&companyPetTypes)
+	data := cpt.db.Where("company_id = ?", companyID).Order("name ASC").Find(&companyPetTypes)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),
