@@ -9,21 +9,21 @@ package injector
 import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
-	repositories11 "na-hora/api/internal/models/appointment/repositories"
+	repositories12 "na-hora/api/internal/models/appointment/repositories"
 	services11 "na-hora/api/internal/models/appointment/services"
 	repositories5 "na-hora/api/internal/models/city/repositories"
 	services5 "na-hora/api/internal/models/city/services"
-	repositories12 "na-hora/api/internal/models/client/repositories"
+	repositories13 "na-hora/api/internal/models/client/repositories"
 	services12 "na-hora/api/internal/models/client/services"
 	repositories7 "na-hora/api/internal/models/company-hour-block/repositories"
 	services7 "na-hora/api/internal/models/company-hour-block/services"
 	repositories6 "na-hora/api/internal/models/company-hour/repositories"
 	services6 "na-hora/api/internal/models/company-hour/services"
-	repositories9 "na-hora/api/internal/models/company-pet-hair/repositories"
+	repositories10 "na-hora/api/internal/models/company-pet-hair/repositories"
 	services9 "na-hora/api/internal/models/company-pet-hair/services"
-	repositories10 "na-hora/api/internal/models/company-pet-size/repositories"
+	repositories11 "na-hora/api/internal/models/company-pet-size/repositories"
 	services10 "na-hora/api/internal/models/company-pet-size/services"
-	repositories13 "na-hora/api/internal/models/company-pet-type/repositories"
+	repositories9 "na-hora/api/internal/models/company-pet-type/repositories"
 	services13 "na-hora/api/internal/models/company-pet-type/services"
 	"na-hora/api/internal/models/company/repositories"
 	"na-hora/api/internal/models/company/services"
@@ -83,37 +83,38 @@ func InitializeCompanyHourBlockService(db *gorm.DB) services7.CompanyHourBlockSe
 
 func InitializePetServiceService(db *gorm.DB) services8.PetServiceServiceInterface {
 	petServiceRepositoryInterface := repositories8.GetPetServiceRepository(db)
-	petServiceServiceInterface := services8.GetPetServiceService(petServiceRepositoryInterface, db)
+	companyPetTypeRepositoryInterface := repositories9.GetCompanyPetTypeRepository(db)
+	petServiceServiceInterface := services8.GetPetServiceService(petServiceRepositoryInterface, companyPetTypeRepositoryInterface)
 	return petServiceServiceInterface
 }
 
 func InitializeCompanyPetHairService(db *gorm.DB) services9.CompanyPetHairServiceInterface {
-	companyPetHairRepositoryInterface := repositories9.GetCompanyPetHairRepository(db)
+	companyPetHairRepositoryInterface := repositories10.GetCompanyPetHairRepository(db)
 	companyPetHairServiceInterface := services9.GetCompanyPetHairService(companyPetHairRepositoryInterface)
 	return companyPetHairServiceInterface
 }
 
 func InitializeCompanyPetSizeService(db *gorm.DB) services10.CompanyPetSizeServiceInterface {
-	companyPetSizeRepositoryInterface := repositories10.GetCompanyPetSizeRepository(db)
+	companyPetSizeRepositoryInterface := repositories11.GetCompanyPetSizeRepository(db)
 	companyPetSizeServiceInterface := services10.GetCompanyPetSizeService(companyPetSizeRepositoryInterface)
 	return companyPetSizeServiceInterface
 }
 
 func InitializeAppointmentService(db *gorm.DB) services11.AppointmentServiceInterface {
-	appointmentRepositoryInterface := repositories11.GetAppointmentRepository(db)
+	appointmentRepositoryInterface := repositories12.GetAppointmentRepository(db)
 	petServiceRepositoryInterface := repositories8.GetPetServiceRepository(db)
 	appointmentServiceInterface := services11.GetAppointmentService(appointmentRepositoryInterface, petServiceRepositoryInterface)
 	return appointmentServiceInterface
 }
 
 func InitializeClientService(db *gorm.DB) services12.ClientServiceInterface {
-	clientRepositoryInterface := repositories12.GetClientRepository(db)
+	clientRepositoryInterface := repositories13.GetClientRepository(db)
 	clientServiceInterface := services12.GetClientService(clientRepositoryInterface)
 	return clientServiceInterface
 }
 
 func InitializeCompanyPetTypeService(db *gorm.DB) services13.CompanyPetTypeServiceInterface {
-	companyPetTypeRepositoryInterface := repositories13.GetCompanyPetTypeRepository(db)
+	companyPetTypeRepositoryInterface := repositories9.GetCompanyPetTypeRepository(db)
 	companyPetTypeServiceInterface := services13.GetCompanyPetTypeService(companyPetTypeRepositoryInterface)
 	return companyPetTypeServiceInterface
 }
@@ -134,14 +135,14 @@ var CompanyHourServiceSet = wire.NewSet(repositories6.GetCompanyHourRepository, 
 
 var CompanyHourBlockServiceSet = wire.NewSet(repositories7.GetCompanyHourBlockRepository, services7.GetCompanyHourBlockService)
 
-var PetServiceServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, services8.GetPetServiceService)
+var PetServiceServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, repositories9.GetCompanyPetTypeRepository, services8.GetPetServiceService)
 
-var CompanyPetHairServiceSet = wire.NewSet(repositories9.GetCompanyPetHairRepository, services9.GetCompanyPetHairService)
+var CompanyPetHairServiceSet = wire.NewSet(repositories10.GetCompanyPetHairRepository, services9.GetCompanyPetHairService)
 
-var CompanyPetSizeServiceSet = wire.NewSet(repositories10.GetCompanyPetSizeRepository, services10.GetCompanyPetSizeService)
+var CompanyPetSizeServiceSet = wire.NewSet(repositories11.GetCompanyPetSizeRepository, services10.GetCompanyPetSizeService)
 
-var AppointmentServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, repositories11.GetAppointmentRepository, services11.GetAppointmentService)
+var AppointmentServiceSet = wire.NewSet(repositories8.GetPetServiceRepository, repositories12.GetAppointmentRepository, services11.GetAppointmentService)
 
-var ClientServiceSet = wire.NewSet(repositories12.GetClientRepository, services12.GetClientService)
+var ClientServiceSet = wire.NewSet(repositories13.GetClientRepository, services12.GetClientService)
 
-var CompanyPetTypeServiceSet = wire.NewSet(repositories13.GetCompanyPetTypeRepository, services13.GetCompanyPetTypeService)
+var CompanyPetTypeServiceSet = wire.NewSet(repositories9.GetCompanyPetTypeRepository, services13.GetCompanyPetTypeService)

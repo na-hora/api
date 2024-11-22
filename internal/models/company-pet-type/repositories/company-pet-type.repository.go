@@ -13,6 +13,7 @@ import (
 type CompanyPetTypeRepositoryInterface interface {
 	CreateMany([]dtos.CreateCompanyPetTypeParams, *gorm.DB) *utils.AppError
 	ListByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError)
+	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetType, *utils.AppError)
 	DeleteByID(petTypeID int, tx *gorm.DB) *utils.AppError
 	UpdateByID(petTypeID int, update dtos.CreateCompanyPetTypeParams, tx *gorm.DB) *utils.AppError
 }
@@ -51,6 +52,27 @@ func (cpt *CompanyPetTypeRepository) CreateMany(insert []dtos.CreateCompanyPetTy
 	}
 
 	return nil
+}
+
+func (cpt *CompanyPetTypeRepository) GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetType, *utils.AppError) {
+	if tx == nil {
+		tx = cpt.db
+	}
+
+	petType := entity.CompanyPetType{}
+	data := tx.Where("id = ?", ID).First(&petType)
+	if data.Error != nil {
+		if data.Error != gorm.ErrRecordNotFound {
+			return nil, &utils.AppError{
+				Message:    data.Error.Error(),
+				StatusCode: http.StatusInternalServerError,
+			}
+		}
+
+		return nil, nil
+	}
+
+	return &petType, nil
 }
 
 func (cpt *CompanyPetTypeRepository) ListByCompanyID(companyID uuid.UUID) ([]entity.CompanyPetType, *utils.AppError) {

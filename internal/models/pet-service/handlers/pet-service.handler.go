@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	config "na-hora/api/configs"
 	"na-hora/api/internal/injector"
 	petServiceDTOs "na-hora/api/internal/models/pet-service/dtos"
@@ -15,7 +14,6 @@ import (
 	tokenServices "na-hora/api/internal/models/token/services"
 
 	"github.com/go-chi/chi"
-	"github.com/go-playground/validator/v10"
 )
 
 type PetServiceHandlerInterface interface {
@@ -42,20 +40,8 @@ func GetPetServiceHandler() PetServiceHandlerInterface {
 }
 
 func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
-	var petServicePayload petServiceDTOs.CreatePetServiceRequestBody
-
-	err := json.NewDecoder(r.Body).Decode(&petServicePayload)
-	if err != nil {
-		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err = validate.Struct(petServicePayload)
-	if err != nil {
-		utils.ResponseValidationErrors(err, w, "body")
-		return
-	}
+	ctx := r.Context()
+	petServicePayload := ctx.Value(utils.ValidatedBodyKey).(*petServiceDTOs.CreatePetServiceRequestBody)
 
 	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
 	if userErr != nil {
@@ -66,7 +52,7 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 	tx := config.StartTransaction()
 	petServiceCreated, appErr := ph.petServiceService.CreatePetService(
 		userLogged.CompanyID,
-		petServicePayload,
+		*petServicePayload,
 		tx,
 	)
 
@@ -148,6 +134,8 @@ func (ph *petServiceHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	responsePetService.ID = petService.ID
 	responsePetService.Name = petService.Name
 	responsePetService.Paralellism = petService.Paralellism
+	responsePetService.Configurations = make([]petServiceDTOs.PetServiceConfiguration, 0)
+	responsePetService.PetTypes = make([]int, 0)
 
 	for _, configuration := range petService.Configurations {
 		responsePetService.Configurations = append(responsePetService.Configurations, petServiceDTOs.PetServiceConfiguration{
@@ -157,6 +145,10 @@ func (ph *petServiceHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 			CompanyPetHairID: configuration.CompanyPetHairID,
 			CompanyPetSizeID: configuration.CompanyPetSizeID,
 		})
+	}
+
+	for _, serviceType := range petService.ServiceTypes {
+		responsePetService.PetTypes = append(responsePetService.PetTypes, serviceType.CompanyPetTypeID)
 	}
 
 	utils.ResponseJSON(w, http.StatusOK, responsePetService)
@@ -191,20 +183,8 @@ func (ph *petServiceHandler) UpdateByID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var petServicePayload petServiceDTOs.UpdatePetServiceRequestBody
-
-	err = json.NewDecoder(r.Body).Decode(&petServicePayload)
-	if err != nil {
-		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err = validate.Struct(petServicePayload)
-	if err != nil {
-		utils.ResponseValidationErrors(err, w, "body")
-		return
-	}
+	ctx := r.Context()
+	petServicePayload := ctx.Value(utils.ValidatedBodyKey).(*petServiceDTOs.UpdatePetServiceRequestBody)
 
 	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
 	if userErr != nil {
@@ -216,7 +196,7 @@ func (ph *petServiceHandler) UpdateByID(w http.ResponseWriter, r *http.Request) 
 	petServiceUpdated, appErr := ph.petServiceService.UpdatePetService(
 		userLogged.CompanyID,
 		petServiceIdParsedToInt,
-		petServicePayload,
+		*petServicePayload,
 		tx,
 	)
 

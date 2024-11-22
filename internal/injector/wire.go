@@ -133,6 +133,7 @@ func InitializeCompanyHourBlockService(db *gorm.DB) companyHourBlockServices.Com
 
 var PetServiceServiceSet = wire.NewSet(
 	petServiceRepositories.GetPetServiceRepository,
+	companyPetTypeRepositories.GetCompanyPetTypeRepository,
 	petServiceServices.GetPetServiceService,
 )
 

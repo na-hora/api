@@ -10,6 +10,7 @@ type GetPetServiceByIDResponse struct {
 	Name           string                    `json:"name"`
 	Paralellism    int                       `json:"paralellism"`
 	Configurations []PetServiceConfiguration `json:"configurations"`
+	PetTypes       []int                     `json:"petTypes"`
 }
 
 type PetServiceConfiguration struct {

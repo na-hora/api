@@ -13,6 +13,8 @@ import (
 type PetServiceRepositoryInterface interface {
 	Create(companyID uuid.UUID, insert dtos.CreatePetServiceRequestBody, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	Update(companyID uuid.UUID, update dtos.UpdateCompanyPetServiceParams, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
+	RelateToType(ID int, PetTypeID int, tx *gorm.DB) *utils.AppError
+	UnrelateFromType(ID int, PetTypeID int, tx *gorm.DB) *utils.AppError
 	CreateConfiguration(ID int, insert dtos.CreateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	UpdateConfiguration(ID int, insert dtos.UpdateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
@@ -54,6 +56,46 @@ func (sr *PetServiceRepository) Create(
 	}
 
 	return &insertValue, nil
+}
+
+func (sr *PetServiceRepository) RelateToType(ID int, PetTypeID int, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	data := tx.Create(&entity.CompanyPetServiceTypes{
+		CompanyPetServiceID: ID,
+		CompanyPetTypeID:    PetTypeID,
+	})
+
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return nil
+}
+
+func (sr *PetServiceRepository) UnrelateFromType(ID int, PetTypeID int, tx *gorm.DB) *utils.AppError {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	data := tx.Delete(&entity.CompanyPetServiceTypes{
+		CompanyPetServiceID: ID,
+		CompanyPetTypeID:    PetTypeID,
+	})
+
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	return nil
 }
 
 func (sr *PetServiceRepository) Update(
@@ -180,7 +222,7 @@ func (sr *PetServiceRepository) GetByID(ID int, tx *gorm.DB) (*entity.CompanyPet
 	}
 
 	petService := entity.CompanyPetService{}
-	data := tx.Where("id = ?", ID).Preload("Configurations").First(&petService)
+	data := tx.Where("id = ?", ID).Preload("Configurations").Preload("ServiceTypes").First(&petService)
 
 	if data.Error != nil {
 		if data.Error != gorm.ErrRecordNotFound {
