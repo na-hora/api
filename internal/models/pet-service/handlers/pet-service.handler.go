@@ -18,6 +18,7 @@ import (
 
 type PetServiceHandlerInterface interface {
 	Register(w http.ResponseWriter, r *http.Request)
+	RelateValues(w http.ResponseWriter, r *http.Request)
 	ListAll(w http.ResponseWriter, r *http.Request)
 	GetByID(w http.ResponseWriter, r *http.Request)
 	DeleteByID(w http.ResponseWriter, r *http.Request)
@@ -73,6 +74,43 @@ func (ph *petServiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseJSON(w, http.StatusCreated, response)
+}
+
+func (ph *petServiceHandler) RelateValues(w http.ResponseWriter, r *http.Request) {
+	ID := chi.URLParam(r, "ID")
+
+	strConv := conversor.GetStringConversor()
+	IDParsedToInt, err := strConv.ToInt(ID)
+	if err != nil {
+		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	payload := ctx.Value(utils.ValidatedBodyKey).(*petServiceDTOs.PetServiceValuesRelateRequestBody)
+
+	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	tx := config.StartTransaction()
+	appErr := ph.petServiceService.RelateValues(userLogged.CompanyID, IDParsedToInt, *payload, tx)
+
+	if appErr != nil {
+		tx.Rollback()
+		utils.ResponseJSON(w, appErr.StatusCode, appErr.Message)
+		return
+	}
+
+	dbInfo := tx.Commit()
+	if dbInfo.Error != nil {
+		utils.ResponseJSON(w, http.StatusInternalServerError, dbInfo.Error.Error())
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, nil)
 }
 
 func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {

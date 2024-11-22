@@ -15,8 +15,9 @@ type PetServiceRepositoryInterface interface {
 	Update(companyID uuid.UUID, update dtos.UpdateCompanyPetServiceParams, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	RelateToType(ID int, PetTypeID int, tx *gorm.DB) *utils.AppError
 	UnrelateFromType(ID int, PetTypeID int, tx *gorm.DB) *utils.AppError
-	CreateConfiguration(ID int, insert dtos.CreateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
-	UpdateConfiguration(ID int, insert dtos.UpdateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
+	CreateConfiguration(companyPetServiceID int, insert dtos.CreateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
+	DeleteConfiguration(configurationID int, tx *gorm.DB) *utils.AppError
+	UpdateConfiguration(companyPetServiceID int, insert dtos.UpdateCompanyPetServiceConfigurationParams, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 	GetByCompanyID(companyID uuid.UUID, tx *gorm.DB) ([]entity.CompanyPetService, *utils.AppError)
 	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	GetConfigurationBySizeAndHair(companyPetServiceID int, sizeID int, hairID int, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
@@ -171,6 +172,33 @@ func (sr *PetServiceRepository) CreateConfiguration(
 	}
 
 	return &insertValue, nil
+}
+
+func (sr *PetServiceRepository) DeleteConfiguration(
+	configurationID int,
+	tx *gorm.DB,
+) *utils.AppError {
+	if tx == nil {
+		tx = sr.db
+	}
+
+	data := tx.Where("id = ?", configurationID).Delete(&entity.CompanyPetServiceValue{})
+
+	if data.Error != nil {
+		return &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	if data.RowsAffected == 0 {
+		return &utils.AppError{
+			Message:    "configuration not found",
+			StatusCode: http.StatusNotFound,
+		}
+	}
+
+	return nil
 }
 
 func (sr *PetServiceRepository) UpdateConfiguration(
