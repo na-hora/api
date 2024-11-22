@@ -14,13 +14,11 @@ func AppointmentRoutes(r chi.Router) {
 	authService := middlewares.NewAuthService()
 
 	r.Route("/appointments", func(r chi.Router) {
-		// Not authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Get("/notifications", appointmentHandler.SseUpdates)
 			r.With(middlewares.ValidateStructBody(&dtos.CreateAppointmentsRequestBody{})).Post("/", appointmentHandler.Create)
 		})
 
-		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.Get("/", appointmentHandler.List)

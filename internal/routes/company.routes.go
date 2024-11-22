@@ -17,12 +17,10 @@ func CompanyRoutes(r chi.Router) {
 	authService := authentication.NewAuthService()
 
 	r.Route("/companies", func(r chi.Router) {
-		// Not authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Post("/register", companyHandler.Register)
 		})
 
-		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.Post("/hour", companyHourHandler.CreateMany)

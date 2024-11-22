@@ -14,13 +14,11 @@ func ClientRoutes(r chi.Router) {
 	authService := middlewares.NewAuthService()
 
 	r.Route("/clients", func(r chi.Router) {
-		// Not authenticated routes
 		r.Group(func(r chi.Router) {
 			r.With(middlewares.ValidateStructBody(&dtos.CreateClientRequestBody{})).Post("/", clientHandler.Create)
 			r.Get("/by-email", clientHandler.GetByEmail)
 		})
 
-		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.Get("/", clientHandler.List)

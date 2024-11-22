@@ -15,7 +15,6 @@ func PetServiceRoutes(r chi.Router) {
 	authService := middlewares.NewAuthService()
 
 	r.Route("/services/pet", func(r chi.Router) {
-		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.With(middlewares.ValidateStructBody(&dtos.CreatePetServiceRequestBody{})).Post("/", petServiceHandler.Register)

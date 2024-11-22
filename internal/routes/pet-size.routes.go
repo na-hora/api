@@ -14,12 +14,10 @@ func PetSizeRoutes(r chi.Router) {
 	authService := middlewares.NewAuthService()
 
 	r.Route("/pet-size", func(r chi.Router) {
-		// Not authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Get("/", petSizeHandler.GetByCompanyID)
 		})
 
-		// Authenticated routes
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
 			r.With(middlewares.ValidateStructBody(&dtos.CreateCompanyPetSizeRequestBody{})).Post("/", petSizeHandler.Create)
