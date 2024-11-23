@@ -22,6 +22,7 @@ type PetServiceServiceInterface interface {
 	GetByID(ID int, tx *gorm.DB) (*entity.CompanyPetService, *utils.AppError)
 	DeleteByID(petServiceID int, tx *gorm.DB) *utils.AppError
 	RelateValues(companyID uuid.UUID, companyPetServiceID int, relate dtos.PetServiceValuesRelateRequestBody, tx *gorm.DB) *utils.AppError
+	GetConfigurationBySizeAndHair(companyPetServiceID int, sizeID int, hairID int, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError)
 }
 
 type PetServiceService struct {
@@ -305,4 +306,8 @@ func (ps *PetServiceService) RelateValues(
 	}
 
 	return nil
+}
+
+func (ps *PetServiceService) GetConfigurationBySizeAndHair(companyPetServiceID int, sizeID int, hairID int, tx *gorm.DB) (*entity.CompanyPetServiceValue, *utils.AppError) {
+	return ps.petServiceRepository.GetConfigurationBySizeAndHair(companyPetServiceID, sizeID, hairID, tx)
 }

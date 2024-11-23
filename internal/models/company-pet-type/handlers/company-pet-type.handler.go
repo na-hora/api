@@ -3,11 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	config "na-hora/api/configs"
+	"na-hora/api/internal/entity"
 	"na-hora/api/internal/injector"
 	companyPetHairServices "na-hora/api/internal/models/company-pet-hair/services"
 	companyPetSizeServices "na-hora/api/internal/models/company-pet-size/services"
 	"na-hora/api/internal/models/company-pet-type/dtos"
 	companyPetTypeServices "na-hora/api/internal/models/company-pet-type/services"
+	companyPetServiceServices "na-hora/api/internal/models/pet-service/services"
 	"na-hora/api/internal/utils"
 	"na-hora/api/internal/utils/authentication"
 	"na-hora/api/internal/utils/conversor"
@@ -26,20 +28,23 @@ type CompanyPetTypeInterface interface {
 }
 
 type CompanyPetTypeHandler struct {
-	companyPetTypeService  companyPetTypeServices.CompanyPetTypeServiceInterface
-	companyPetHairService  companyPetHairServices.CompanyPetHairServiceInterface
-	companyPetSizeServices companyPetSizeServices.CompanyPetSizeServiceInterface
+	companyPetTypeService    companyPetTypeServices.CompanyPetTypeServiceInterface
+	companyPetHairService    companyPetHairServices.CompanyPetHairServiceInterface
+	companyPetSizeServices   companyPetSizeServices.CompanyPetSizeServiceInterface
+	companyPetServiceService companyPetServiceServices.PetServiceServiceInterface
 }
 
 func GetCompanyPetTypeHandler() CompanyPetTypeInterface {
 	companyPetTypeService := injector.InitializeCompanyPetTypeService(config.DB)
 	companyPetHairService := injector.InitializeCompanyPetHairService(config.DB)
 	companyPetSizeServices := injector.InitializeCompanyPetSizeService(config.DB)
+	companyPetServiceServices := injector.InitializePetServiceService(config.DB)
 
 	return &CompanyPetTypeHandler{
 		companyPetTypeService,
 		companyPetHairService,
 		companyPetSizeServices,
+		companyPetServiceServices,
 	}
 }
 
@@ -96,11 +101,22 @@ func (cpt *CompanyPetTypeHandler) GetByCompanyID(w http.ResponseWriter, r *http.
 
 func (cpt *CompanyPetTypeHandler) GetValuesCombinations(w http.ResponseWriter, r *http.Request) {
 	petTypeId := chi.URLParam(r, "ID")
+	petServiceId := r.URL.Query().Get("petServiceId")
 
-	parsedPetTypeId, err := strconv.Atoi(petTypeId)
+	strConv := conversor.GetStringConversor()
+	parsedPetTypeId, err := strConv.ToInt(petTypeId)
 	if err != nil {
 		utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	parsedServiceId := 0
+	if petServiceId != "" {
+		parsedServiceId, err = strConv.ToInt(petServiceId)
+		if err != nil {
+			utils.ResponseJSON(w, http.StatusBadRequest, err.Error())
+			return
+		}
 	}
 
 	sizes, sizesErr := cpt.companyPetSizeServices.ListByPetTypeID(parsedPetTypeId, nil)
@@ -118,10 +134,28 @@ func (cpt *CompanyPetTypeHandler) GetValuesCombinations(w http.ResponseWriter, r
 	var responseCombinations = make([]dtos.ListPetTypeCombinationsResponse, 0)
 	for _, size := range sizes {
 		for _, hair := range hairs {
-			responseCombinations = append(responseCombinations, dtos.ListPetTypeCombinationsResponse{
+			var configFound *entity.CompanyPetServiceValue
+			if parsedServiceId != 0 {
+				found, findErr := cpt.companyPetServiceService.GetConfigurationBySizeAndHair(parsedServiceId, size.ID, hair.ID, nil)
+				if findErr != nil {
+					utils.ResponseJSON(w, findErr.StatusCode, findErr.Message)
+					return
+				}
+				if found != nil {
+					configFound = found
+				}
+			}
+
+			toAppend := dtos.ListPetTypeCombinationsResponse{
 				Hair: dtos.PetTypeCombinationsHair{ID: hair.ID, Name: hair.Name},
 				Size: dtos.PetTypeCombinationsSize{ID: size.ID, Name: size.Name},
-			})
+			}
+
+			if configFound != nil {
+				toAppend.Price = &configFound.Price
+				toAppend.ExecutionTime = &configFound.ExecutionTime
+			}
+			responseCombinations = append(responseCombinations, toAppend)
 		}
 	}
 

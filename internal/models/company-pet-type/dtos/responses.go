@@ -6,8 +6,10 @@ type ListPetTypesByCompanyResponse struct {
 }
 
 type ListPetTypeCombinationsResponse struct {
-	Hair PetTypeCombinationsHair `json:"hair"`
-	Size PetTypeCombinationsSize `json:"size"`
+	Hair          PetTypeCombinationsHair `json:"hair"`
+	Size          PetTypeCombinationsSize `json:"size"`
+	Price         *float64                `json:"price"`
+	ExecutionTime *int                    `json:"executionTime"`
 }
 
 type PetTypeCombinationsHair struct {
