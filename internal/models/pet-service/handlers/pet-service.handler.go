@@ -146,9 +146,10 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 		}
 
 		responsePetService = append(responsePetService, petServiceDTOs.ListPetServicesByCompanyResponse{
-			ID:       petService.ID,
-			Name:     petService.Name,
-			PetTypes: petTypes,
+			ID:          petService.ID,
+			Name:        petService.Name,
+			Paralellism: petService.Paralellism,
+			PetTypes:    petTypes,
 		})
 	}
 

@@ -1,9 +1,10 @@
 package dtos
 
 type ListPetServicesByCompanyResponse struct {
-	ID       int               `json:"id"`
-	Name     string            `json:"name"`
-	PetTypes []PetTypeResponse `json:"petTypes"`
+	ID          int               `json:"id"`
+	Name        string            `json:"name"`
+	Paralellism int               `json:"paralellism"`
+	PetTypes    []PetTypeResponse `json:"petTypes"`
 }
 
 type PetTypeResponse struct {
