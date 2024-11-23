@@ -234,7 +234,7 @@ func (sr *PetServiceRepository) GetByCompanyID(companyID uuid.UUID, tx *gorm.DB)
 	}
 
 	petService := []entity.CompanyPetService{}
-	data := tx.Where("company_id = ?", companyID).Find(&petService)
+	data := tx.Where("company_id = ?", companyID).Preload("ServiceTypes").Preload("ServiceTypes.CompanyPetType").Find(&petService)
 	if data.Error != nil {
 		return nil, &utils.AppError{
 			Message:    data.Error.Error(),

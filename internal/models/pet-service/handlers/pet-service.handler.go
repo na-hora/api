@@ -137,9 +137,18 @@ func (ph *petServiceHandler) ListAll(w http.ResponseWriter, r *http.Request) {
 
 	var responsePetService = make([]petServiceDTOs.ListPetServicesByCompanyResponse, 0)
 	for _, petService := range petServices {
+		petTypes := make([]petServiceDTOs.PetTypeResponse, 0)
+		for _, serviceType := range petService.ServiceTypes {
+			petTypes = append(petTypes, petServiceDTOs.PetTypeResponse{
+				ID:   serviceType.CompanyPetType.ID,
+				Name: serviceType.CompanyPetType.Name,
+			})
+		}
+
 		responsePetService = append(responsePetService, petServiceDTOs.ListPetServicesByCompanyResponse{
-			ID:   petService.ID,
-			Name: petService.Name,
+			ID:       petService.ID,
+			Name:     petService.Name,
+			PetTypes: petTypes,
 		})
 	}
 
