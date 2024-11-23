@@ -10,6 +10,8 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -42,7 +44,16 @@ func (ps *PetServiceService) CreatePetService(
 	petServiceCreate dtos.CreatePetServiceRequestBody,
 	tx *gorm.DB,
 ) (*entity.CompanyPetService, *utils.AppError) {
-	petServiceCreated, err := ps.petServiceRepository.Create(companyID, petServiceCreate, tx)
+	caser := cases.Title(language.BrazilianPortuguese)
+	nameTitled := caser.String(petServiceCreate.Name)
+
+	payload := dtos.CreatePetServiceRequestBody{
+		Name:        nameTitled,
+		Paralellism: petServiceCreate.Paralellism,
+		PetTypes:    petServiceCreate.PetTypes,
+	}
+
+	petServiceCreated, err := ps.petServiceRepository.Create(companyID, payload, tx)
 	if err != nil {
 		return nil, err
 	}
@@ -98,9 +109,12 @@ func (ps *PetServiceService) UpdatePetService(
 		}
 	}
 
+	caser := cases.Title(language.BrazilianPortuguese)
+	nameTitled := caser.String(petServiceUpdate.Name)
+
 	petServiceUpdated, err := ps.petServiceRepository.Update(companyID, dtos.UpdateCompanyPetServiceParams{
 		ID:          ID,
-		Name:        petServiceUpdate.Name,
+		Name:        nameTitled,
 		Paralellism: petServiceUpdate.Paralellism,
 	}, tx)
 

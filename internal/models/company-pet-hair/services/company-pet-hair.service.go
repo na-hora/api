@@ -7,6 +7,8 @@ import (
 	"na-hora/api/internal/utils"
 
 	"github.com/google/uuid"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -35,8 +37,11 @@ func (cphs *CompanyPetHairService) Create(
 ) *utils.AppError {
 	insertData := []dtos.CreateCompanyPetHairParams{}
 
+	caser := cases.Title(language.BrazilianPortuguese)
+	nameTitled := caser.String(petHairCreate.Name)
+
 	insertData = append(insertData, dtos.CreateCompanyPetHairParams{
-		Name:             petHairCreate.Name,
+		Name:             nameTitled,
 		Description:      petHairCreate.Description,
 		CompanyID:        companyID,
 		CompanyPetTypeID: petHairCreate.CompanyPetTypeID,
@@ -64,5 +69,11 @@ func (chs *CompanyPetHairService) DeleteByID(petHairID int, tx *gorm.DB) *utils.
 }
 
 func (cpt *CompanyPetHairService) UpdateByID(petHairID int, update dtos.UpdateCompanyPetHairParams, tx *gorm.DB) *utils.AppError {
-	return cpt.companyPetHairRepository.UpdateByID(petHairID, update, tx)
+	caser := cases.Title(language.BrazilianPortuguese)
+	nameTitled := caser.String(update.Name)
+
+	return cpt.companyPetHairRepository.UpdateByID(petHairID, dtos.UpdateCompanyPetHairParams{
+		Name:        nameTitled,
+		Description: update.Description,
+	}, tx)
 }
