@@ -27,10 +27,10 @@ func (chs *CompanyHourService) CreateManyCompanyHour(hourCreate dtos.CreateCompa
 	var params = []dtos.CreateCompanyHourParams{}
 	for _, register := range hourCreate.Registers {
 		params = append(params, dtos.CreateCompanyHourParams{
-			CompanyID: companyID,
-			Weekday:   register.Weekday,
-			StartHour: register.StartMinute,
-			EndHour:   register.EndMinute,
+			CompanyID:   companyID,
+			Weekday:     register.Weekday,
+			StartMinute: register.StartMinute,
+			EndMinute:   register.EndMinute,
 		})
 	}
 

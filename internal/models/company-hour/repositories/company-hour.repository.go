@@ -31,10 +31,10 @@ func (chr *CompanyHourRepository) CreateMany(insert []dtos.CreateCompanyHourPara
 
 	for _, data := range insert {
 		treatedInserts = append(treatedInserts, entity.CompanyHour{
-			CompanyID: data.CompanyID,
-			Weekday:   data.Weekday,
-			StartHour: data.StartHour,
-			EndHour:   data.EndHour,
+			CompanyID:   data.CompanyID,
+			Weekday:     data.Weekday,
+			StartMinute: data.StartMinute,
+			EndMinute:   data.EndMinute,
 		})
 
 		total = total + 1
