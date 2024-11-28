@@ -5,7 +5,8 @@ type CreateCompanyHourRequestBody struct {
 }
 
 type CompanyHourRequestData struct {
-	Weekday   int `json:"weekday" validate:"required"`
-	StartHour int `json:"startHour" validate:"required,format=datetime"`
-	EndHour   int `json:"endHour" validate:"required,format=datetime"`
+	ID          int `json:"id"`
+	Weekday     int `json:"weekday" validate:"required"`
+	StartMinute int `json:"startMinute" validate:"required"`
+	EndMinute   int `json:"endMinute" validate:"required"`
 }
