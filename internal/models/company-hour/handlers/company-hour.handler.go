@@ -16,7 +16,7 @@ import (
 
 type CompanyHourHandlerInterface interface {
 	ListByCompanyID(w http.ResponseWriter, r *http.Request)
-	CreateMany(w http.ResponseWriter, r *http.Request)
+	RelateHours(w http.ResponseWriter, r *http.Request)
 }
 
 type CompanyHourHandler struct {
@@ -48,7 +48,7 @@ func (chh *CompanyHourHandler) ListByCompanyID(w http.ResponseWriter, r *http.Re
 
 }
 
-func (chh *CompanyHourHandler) CreateMany(w http.ResponseWriter, r *http.Request) {
+func (chh *CompanyHourHandler) RelateHours(w http.ResponseWriter, r *http.Request) {
 	var companyHourPayload companyHourDTOs.CreateCompanyHourRequestBody
 
 	err := json.NewDecoder(r.Body).Decode(&companyHourPayload)
@@ -65,13 +65,12 @@ func (chh *CompanyHourHandler) CreateMany(w http.ResponseWriter, r *http.Request
 	}
 
 	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
-
 	if userErr != nil {
 		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
 		return
 	}
 
-	hourErr := chh.companyHourService.CreateManyCompanyHour(companyHourPayload, userLogged.CompanyID, nil)
+	hourErr := chh.companyHourService.RelateCompanyHour(companyHourPayload, userLogged.CompanyID, nil)
 	if hourErr != nil {
 		utils.ResponseJSON(w, hourErr.StatusCode, hourErr.Message)
 		return
