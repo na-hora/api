@@ -23,6 +23,7 @@ func CompanyRoutes(r chi.Router) {
 
 		r.Group(func(r chi.Router) {
 			r.Use(authService.JwtAuthMiddleware)
+			r.Get("/hour", companyHourHandler.ListByCompanyID)
 			r.Post("/hour", companyHourHandler.CreateMany)
 			r.Post("/hour/block", companyHourBlockHandler.CreateMany)
 		})

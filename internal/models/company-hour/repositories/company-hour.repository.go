@@ -6,10 +6,12 @@ import (
 	"na-hora/api/internal/utils"
 	"net/http"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type CompanyHourRepositoryInterface interface {
+	ListByCompanyID(uuid.UUID) ([]dtos.ListHoursByCompanyIDResponse, *utils.AppError)
 	CreateMany([]dtos.CreateCompanyHourParams, *gorm.DB) *utils.AppError
 }
 
@@ -19,6 +21,29 @@ type CompanyHourRepository struct {
 
 func GetCompanyHourRepository(db *gorm.DB) CompanyHourRepositoryInterface {
 	return &CompanyHourRepository{db}
+}
+
+func (chr *CompanyHourRepository) ListByCompanyID(companyID uuid.UUID) ([]dtos.ListHoursByCompanyIDResponse, *utils.AppError) {
+	var companyHours []entity.CompanyHour
+
+	data := chr.db.Where("company_id = ?", companyID).Find(&companyHours).Order("weekday").Order("start_minute").Order("end_minute")
+	if data.Error != nil {
+		return nil, &utils.AppError{
+			Message:    data.Error.Error(),
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+
+	var response []dtos.ListHoursByCompanyIDResponse
+	for _, hour := range companyHours {
+		response = append(response, dtos.ListHoursByCompanyIDResponse{
+			Weekday:     hour.Weekday,
+			StartMinute: hour.StartMinute,
+			EndMinute:   hour.EndMinute,
+		})
+	}
+
+	return response, nil
 }
 
 func (chr *CompanyHourRepository) CreateMany(insert []dtos.CreateCompanyHourParams, tx *gorm.DB) *utils.AppError {

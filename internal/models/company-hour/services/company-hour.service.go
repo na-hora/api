@@ -10,6 +10,7 @@ import (
 )
 
 type CompanyHourServiceInterface interface {
+	ListByCompanyID(companyID uuid.UUID) ([]dtos.ListHoursByCompanyIDResponse, *utils.AppError)
 	CreateManyCompanyHour(hourCreate dtos.CreateCompanyHourRequestBody, companyID uuid.UUID, tx *gorm.DB) *utils.AppError
 }
 
@@ -21,6 +22,10 @@ func GetCompanyHourService(repo repositories.CompanyHourRepositoryInterface) Com
 	return &CompanyHourService{
 		repo,
 	}
+}
+
+func (chs *CompanyHourService) ListByCompanyID(companyID uuid.UUID) ([]dtos.ListHoursByCompanyIDResponse, *utils.AppError) {
+	return chs.companyHourRepository.ListByCompanyID(companyID)
 }
 
 func (chs *CompanyHourService) CreateManyCompanyHour(hourCreate dtos.CreateCompanyHourRequestBody, companyID uuid.UUID, tx *gorm.DB) *utils.AppError {

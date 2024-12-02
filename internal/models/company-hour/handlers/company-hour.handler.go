@@ -15,6 +15,7 @@ import (
 )
 
 type CompanyHourHandlerInterface interface {
+	ListByCompanyID(w http.ResponseWriter, r *http.Request)
 	CreateMany(w http.ResponseWriter, r *http.Request)
 }
 
@@ -28,6 +29,23 @@ func GetCompanyHourHandler() CompanyHourHandlerInterface {
 	return &CompanyHourHandler{
 		companyHourService,
 	}
+}
+
+func (chh *CompanyHourHandler) ListByCompanyID(w http.ResponseWriter, r *http.Request) {
+	userLogged, userErr := authentication.JwtUserOrThrow(r.Context())
+	if userErr != nil {
+		utils.ResponseJSON(w, userErr.StatusCode, userErr.Message)
+		return
+	}
+
+	hours, err := chh.companyHourService.ListByCompanyID(userLogged.CompanyID)
+	if err != nil {
+		utils.ResponseJSON(w, err.StatusCode, err.Message)
+		return
+	}
+
+	utils.ResponseJSON(w, http.StatusOK, hours)
+
 }
 
 func (chh *CompanyHourHandler) CreateMany(w http.ResponseWriter, r *http.Request) {
